@@ -29,10 +29,10 @@ if (!defined('WPINC')) {
 }
 
 // Check WordPress version
-if (version_compare(get_bloginfo('version'), '4.7', '<')) {
+if (version_compare(get_bloginfo('version'), '5.0', '<')) {
 	add_action('admin_notices', function () {
 		echo '<div class="notice notice-error"><p>';
-		echo '<strong>FAQ AI Generator</strong> requires WordPress 4.7 or higher. Please upgrade WordPress to use this plugin.';
+		echo '<strong>FAQ AI Generator</strong> requires WordPress 5.0 or higher. Please upgrade WordPress to use this plugin.';
 		echo '</p></div>';
 	});
 	return;

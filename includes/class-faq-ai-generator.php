@@ -77,7 +77,6 @@ class Faq_Ai_Generator
 		$this->plugin_name = 'faq-ai-generator';
 
 		$this->load_dependencies();
-		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -89,7 +88,6 @@ class Faq_Ai_Generator
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Faq_Ai_Generator_Loader. Orchestrates the hooks of the plugin.
-	 * - Faq_Ai_Generator_i18n. Defines internationalization functionality.
 	 * - Faq_Ai_Generator_Admin. Defines all hooks for the admin area.
 	 * - Faq_Ai_Generator_Public. Defines all hooks for the public side of the site.
 	 *
@@ -107,12 +105,6 @@ class Faq_Ai_Generator
 		 * core plugin.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-loader.php';
-
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -139,23 +131,6 @@ class Faq_Ai_Generator
 
 	}
 
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the Faq_Ai_Generator_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function set_locale()
-	{
-
-		$plugin_i18n = new Faq_Ai_Generator_i18n();
-
-		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
-
-	}
 
 	/**
 	 * Register all of the hooks related to the admin area functionality
