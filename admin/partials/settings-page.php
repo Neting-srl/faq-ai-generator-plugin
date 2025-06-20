@@ -23,14 +23,14 @@ require_once plugin_dir_path(dirname(__FILE__)) . '../includes/class-faq-ai-gene
 $settings = get_option('faq_ai_generator_settings', array(
     'api_key' => '',
     'ai_provider' => 'openai',
-    'model' => 'gpt-3.5-turbo',
+    'model' => Faq_Ai_Generator_Models::get_default_model(),
     'extra_prompt' => '',
     'custom_instructions' => '',
     'enabled_post_types' => array()
 ));
 
 // Recupera lo stato dell'API
-$api_status = get_transient('faq_ai_api_status');
+$api_status = Faq_Ai_Generator_Api::test_api_key_static($settings['api_key']);
 $api_error = get_transient('faq_ai_api_error');
 
 // Recupera i modelli disponibili
@@ -62,8 +62,8 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
                     <input type="password" id="api_key" name="faq_ai_generator_settings[api_key]"
                         value="<?php echo esc_attr($settings['api_key']); ?>" class="regular-text" />
                     <?php if (!empty($settings['api_key'])): ?>
-                        <span class="api-status <?php echo esc_attr($api_status); ?>">
-                            <?php echo $api_status === 'valid' ? '✓' : '✗'; ?>
+                        <span class="api-status <?php echo esc_attr($api_status === true ? 'valid' : 'invalid'); ?>">
+                            <?php echo $api_status === true ? '✓' : '✗'; ?>
                         </span>
                     <?php endif; ?>
                     <p class="description">
@@ -199,32 +199,5 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
 </div>
 
 <style>
-    .api-status {
-        display: inline-block;
-        margin-left: 10px;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-weight: bold;
-    }
 
-    .api-status.valid {
-        color: #46b450;
-        background: #f0f6f0;
-    }
-
-    .api-status.invalid {
-        color: #dc3232;
-        background: #fbeaea;
-    }
-
-    .readonly-checkbox {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .readonly-checkbox+.description {
-        color: #666;
-        font-style: italic;
-        margin-left: 5px;
-    }
 </style>

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@wordpress/scripts": "^30.18.0"
+  },
+  "scripts": {
+    "zip": "wp-scripts plugin-zip"
+  }
+}

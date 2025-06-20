@@ -181,15 +181,13 @@ class Faq_Ai_Generator_Admin
 
 		// Se la chiave API è stata modificata, verifichiamola
 		if (!empty($valid['api_key']) && $valid['api_key'] !== get_option('faq_ai_generator_settings')['api_key']) {
-			$api = new Faq_Ai_Generator_Api();
-			$test_result = $api->test_api_key($valid['api_key']);
+			$test_result = Faq_Ai_Generator_Api::test_api_key_static($valid['api_key']);
 
 			if (is_wp_error($test_result)) {
 				set_transient('faq_ai_api_error', $test_result->get_error_message(), 45);
-				set_transient('faq_ai_api_status', 'invalid', 45);
 				$valid['api_key'] = ''; // Resetta la chiave API se non valida
 			} else {
-				set_transient('faq_ai_api_status', 'valid', 45);
+				delete_transient('faq_ai_api_error');
 			}
 		} elseif (empty($valid['api_key'])) {
 			delete_transient('faq_ai_api_status');

@@ -36,6 +36,15 @@ class Faq_Ai_Generator_Api
     private $api_key;
 
     /**
+     * The model ID
+     *
+     * @since    1.1.4
+     * @access   private
+     * @var      string
+     */
+    private $model_id;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    1.0.0
@@ -43,6 +52,7 @@ class Faq_Ai_Generator_Api
     public function __construct()
     {
         $this->api_key = get_option('faq_ai_generator_settings')['api_key'] ?? '';
+        $this->model_id = get_option('faq_ai_generator_settings')['model'] ?? Faq_Ai_Generator_Models::get_default_model();
     }
 
     /**
@@ -52,32 +62,20 @@ class Faq_Ai_Generator_Api
      * @param    string    $api_key    The API key to test
      * @return   bool|WP_Error        True if valid, WP_Error if invalid
      */
-    public function test_api_key($api_key = null)
+    public static function test_api_key_static($api_key = null)
     {
-        if ($api_key) {
-            $this->api_key = $api_key;
-        }
-
-        if (empty($this->api_key)) {
+        if (empty($api_key)) {
             return new WP_Error('no_api_key', __('API key not configured', 'faq-ai-generator-plugin'));
         }
 
-        $response = wp_remote_post($this->api_endpoint, [
+        $test_endpoint = 'https://api.openai.com/v1/models';
+
+        $response = wp_remote_get($test_endpoint, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->api_key,
+                'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type' => 'application/json',
             ],
-            'body' => json_encode([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => 'Test'
-                    ]
-                ],
-                'max_tokens' => 5
-            ]),
-            'timeout' => 60
+            'timeout' => 30
         ]);
 
         if (is_wp_error($response)) {
@@ -91,6 +89,12 @@ class Faq_Ai_Generator_Api
         }
 
         return true;
+    }
+
+    public function test_api_key($api_key = null)
+    {
+        $this->api_key = $api_key;
+        return self::test_api_key_static($api_key);
     }
 
     /**
@@ -661,10 +665,6 @@ class Faq_Ai_Generator_Api
             }
         }
 
-        // Recupera le impostazioni
-        $settings = get_option('faq_ai_generator_settings');
-        $model = !empty($settings['model']) ? $settings['model'] : 'gpt-3.5-turbo';
-
         // Genera il prompt completo
         $prompt = $this->build_prompt($content, $existing_faqs);
         if (FAQ_AI_DEBUG) {
@@ -674,7 +674,7 @@ class Faq_Ai_Generator_Api
 
         // Prepara i dati per la chiamata API
         $request_data = array(
-            'model' => $model,
+            'model' => $this->model_id,
             'messages' => array(
                 array(
                     'role' => 'system',
@@ -692,7 +692,7 @@ class Faq_Ai_Generator_Api
         // Modifica dei log per usare la costante di debug
         if (FAQ_AI_DEBUG) {
             error_log('FAQ AI Generator - Request Parameters:');
-            error_log('Model: ' . $model);
+            error_log('Model: ' . $this->model_id);
             error_log('Prompt Length: ' . strlen($prompt));
             error_log('Existing FAQs Count: ' . count($existing_faqs));
             error_log('Request Data: ' . json_encode($request_data, JSON_PRETTY_PRINT));
@@ -736,7 +736,8 @@ class Faq_Ai_Generator_Api
                 error_log('FAQ AI Generator - API Error: ' . $response_code);
                 error_log('FAQ AI Generator - Response Body: ' . $response_body);
             }
-            return new WP_Error('api_error', __('API error: ' . $response_code . ' - ' . $response_body, 'faq-ai-generator-plugin'));
+            /* translators: %s: API error message %s: API error code */
+            return new WP_Error('api_error', sprintf(__('API error: %s - %s', 'faq-ai-generator-plugin'), $response_code, $response_body));
         }
 
 

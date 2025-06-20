@@ -104,3 +104,32 @@
 	gap: 10px;
 	flex-wrap: wrap;
 }
+
+.api-status {
+	display: inline-block;
+	margin-left: 10px;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-weight: bold;
+}
+
+.api-status.valid {
+	color: #46b450;
+	background: #f0f6f0;
+}
+
+.api-status.invalid {
+	color: #dc3232;
+	background: #fbeaea;
+}
+
+.readonly-checkbox {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.readonly-checkbox + .description {
+	color: #666;
+	font-style: italic;
+	margin-left: 5px;
+}

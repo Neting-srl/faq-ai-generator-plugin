@@ -85,7 +85,7 @@ class Faq_Ai_Generator_Models
      */
     public static function get_default_model()
     {
-        return 'gpt-4-1106-preview';
+        return 'gpt-4o-mini';
     }
 
     /**
