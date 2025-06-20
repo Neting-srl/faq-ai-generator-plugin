@@ -130,6 +130,11 @@ class Faq_Ai_Generator
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-schema.php';
 
+		/**
+		 * La classe responsabile del logging
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-logger.php';
+
 		$this->loader = new Faq_Ai_Generator_Loader();
 
 	}
