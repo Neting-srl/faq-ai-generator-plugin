@@ -37,7 +37,7 @@ class Faq_Ai_Generator_i18n
 	{
 
 		load_plugin_textdomain(
-			'faq-ai-generator-plugin',
+			'faq-ai-generator',
 			false,
 			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
 		);

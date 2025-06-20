@@ -12,17 +12,40 @@
  * Plugin URI:        https://github.com/netingweb/faq-ai-generator-plugin
  * Description:       Genera automaticamente FAQ per i tuoi contenuti WordPress utilizzando l'intelligenza artificiale.
  * Version:           1.1.4
+ * Requires at least: 5.0
+ * Tested up to:      6.4
+ * Requires PHP:      7.4
  * Author:            netingweb
  * Author URI:        https://profiles.wordpress.org/netingweb/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       faq-ai-generator-plugin
+ * Text Domain:       faq-ai-generator
  * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
 	die;
+}
+
+// Check WordPress version
+if (version_compare(get_bloginfo('version'), '4.7', '<')) {
+	add_action('admin_notices', function () {
+		echo '<div class="notice notice-error"><p>';
+		echo '<strong>FAQ AI Generator</strong> requires WordPress 4.7 or higher. Please upgrade WordPress to use this plugin.';
+		echo '</p></div>';
+	});
+	return;
+}
+
+// Check PHP version
+if (version_compare(PHP_VERSION, '7.4', '<')) {
+	add_action('admin_notices', function () {
+		echo '<div class="notice notice-error"><p>';
+		echo '<strong>FAQ AI Generator</strong> requires PHP 7.4 or higher. Please upgrade PHP to use this plugin.';
+		echo '</p></div>';
+	});
+	return;
 }
 
 /**

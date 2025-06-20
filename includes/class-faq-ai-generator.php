@@ -74,7 +74,7 @@ class Faq_Ai_Generator
 		} else {
 			$this->version = '1.1.0';
 		}
-		$this->plugin_name = 'faq-ai-generator-plugin';
+		$this->plugin_name = 'faq-ai-generator';
 
 		$this->load_dependencies();
 		$this->set_locale();

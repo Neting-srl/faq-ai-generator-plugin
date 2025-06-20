@@ -89,7 +89,7 @@ class Faq_Ai_Generator_Logger
 		}
 
 		// Formatta l'intestazione del log
-		$log_entry = date('[Y-m-d H:i:s]') . ' ' . self::get_level_name($level) . ': ';
+		$log_entry = gmdate('[Y-m-d H:i:s]') . ' ' . self::get_level_name($level) . ': ';
 
 		// Formatta il messaggio
 		if (is_array($message) || is_object($message)) {
@@ -202,7 +202,17 @@ class Faq_Ai_Generator_Logger
 		}
 
 		if (file_exists($log_file) && filesize($log_file) > 10 * 1024 * 1024) { // 10MB
-			rename($log_file, $log_file . '.' . date('Y-m-d-H-i-s') . '.bak');
+			// Use WP_Filesystem instead of rename() for better security
+			global $wp_filesystem;
+
+			// Initialize WP_Filesystem if not already done
+			if (empty($wp_filesystem)) {
+				require_once(ABSPATH . '/wp-admin/includes/file.php');
+				WP_Filesystem();
+			}
+
+			$backup_file = $log_file . '.' . gmdate('Y-m-d-H-i-s') . '.bak';
+			$wp_filesystem->move($log_file, $backup_file, true);
 		}
 	}
 }

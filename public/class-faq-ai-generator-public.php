@@ -158,7 +158,7 @@ class Faq_Ai_Generator_Public
 
 		// Genera l'HTML delle FAQ
 		$faq_html = '<div class="faq-ai-generator-container">';
-		$faq_html .= '<h2>' . __('Frequently Asked Questions', 'faq-ai-generator-plugin') . '</h2>';
+		$faq_html .= '<h2>' . __('Frequently Asked Questions', 'faq-ai-generator') . '</h2>';
 		$faq_html .= '<div class="faq-ai-generator-list">';
 
 		foreach ($faq_data['faqs'] as $faq) {

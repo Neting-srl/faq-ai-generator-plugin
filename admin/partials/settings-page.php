@@ -56,32 +56,31 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
         <table class="form-table">
             <tr>
                 <th scope="row">
-                    <label for="api_key"><?php esc_html_e('OpenAI API Key', 'faq-ai-generator-plugin'); ?></label>
+                    <label for="api_key"><?php esc_html_e('OpenAI API Key', 'faq-ai-generator'); ?></label>
                 </th>
                 <td>
                     <input type="password" id="api_key" name="faq_ai_generator_settings[api_key]"
-                        value="<?php echo esc_attr($settings['api_key']); ?>" class="regular-text" />
+                        value="<?php echo esc_attr($settings['api_key'] ?? ''); ?>" class="regular-text" />
                     <?php if (!empty($settings['api_key'])): ?>
                         <span class="api-status <?php echo esc_attr($api_status === true ? 'valid' : 'invalid'); ?>">
                             <?php echo $api_status === true ? '✓' : '✗'; ?>
                         </span>
                     <?php endif; ?>
                     <p class="description">
-                        <?php esc_html_e('Enter your OpenAI API Key. You can get it from', 'faq-ai-generator-plugin'); ?>
-                        <a href="https://platform.openai.com/api-keys"
-                            target="_blank">https://platform.openai.com/api-keys</a>
+                        <?php esc_html_e('Enter your OpenAI API Key. You can get it from', 'faq-ai-generator'); ?>
+                        <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
                     </p>
                 </td>
             </tr>
 
             <tr>
                 <th scope="row">
-                    <label for="ai_provider"><?php esc_html_e('AI Provider', 'faq-ai-generator-plugin'); ?></label>
+                    <label for="ai_provider"><?php esc_html_e('AI Provider', 'faq-ai-generator'); ?></label>
                 </th>
                 <td>
                     <select id="ai_provider" name="faq_ai_generator_settings[ai_provider]">
-                        <option value="openai" <?php selected($settings['ai_provider'], 'openai'); ?>>
-                            <?php esc_html_e('OpenAI', 'faq-ai-generator-plugin'); ?>
+                        <option value="openai" <?php selected($settings['ai_provider'] ?? 'openai', 'openai'); ?>>
+                            <?php esc_html_e('OpenAI', 'faq-ai-generator'); ?>
                         </option>
                     </select>
                 </td>
@@ -89,12 +88,12 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
 
             <tr>
                 <th scope="row">
-                    <label for="model"><?php esc_html_e('Model', 'faq-ai-generator-plugin'); ?></label>
+                    <label for="model"><?php esc_html_e('Model', 'faq-ai-generator'); ?></label>
                 </th>
                 <td>
                     <select id="model" name="faq_ai_generator_settings[model]">
                         <?php foreach ($model_options as $id => $name): ?>
-                            <option value="<?php echo esc_attr($id); ?>" <?php selected($settings['model'], $id); ?>>
+                            <option value="<?php echo esc_attr($id); ?>" <?php selected($settings['model'] ?? Faq_Ai_Generator_Models::get_default_model(), $id); ?>>
                                 <?php echo esc_html($name); ?>
                             </option>
                         <?php endforeach; ?>
@@ -109,20 +108,20 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
 
             <tr>
                 <th scope="row">
-                    <label for="extra_prompt"><?php esc_html_e('Extra Prompt', 'faq-ai-generator-plugin'); ?></label>
+                    <label for="extra_prompt"><?php esc_html_e('Extra Prompt', 'faq-ai-generator'); ?></label>
                 </th>
                 <td>
                     <textarea id="extra_prompt" name="faq_ai_generator_settings[extra_prompt]" class="large-text code"
-                        rows="3"><?php echo esc_textarea(isset($settings['extra_prompt']) ? $settings['extra_prompt'] : ''); ?></textarea>
+                        rows="3"><?php echo esc_textarea($settings['extra_prompt'] ?? ''); ?></textarea>
                     <p class="description">
-                        <?php esc_html_e('Extra instructions for the AI prompt (use with caution). These instructions will be added at the beginning of the prompt.', 'faq-ai-generator-plugin'); ?>
+                        <?php esc_html_e('Additional instructions that will be added at the beginning of the prompt.', 'faq-ai-generator'); ?>
                     </p>
                 </td>
             </tr>
 
             <tr>
                 <th scope="row">
-                    <?php esc_html_e('Custom Post Types', 'faq-ai-generator-plugin'); ?>
+                    <?php esc_html_e('Custom Post Types', 'faq-ai-generator'); ?>
                 </th>
                 <td>
                     <?php
@@ -140,7 +139,7 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
                             <?php
                         }
                     } else {
-                        esc_html_e('No custom post types found.', 'faq-ai-generator-plugin');
+                        esc_html_e('No custom post types found.', 'faq-ai-generator');
                     }
                     ?>
                 </td>
@@ -148,7 +147,7 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
 
             <tr>
                 <th scope="row">
-                    <?php esc_html_e('Built-in Post Types', 'faq-ai-generator-plugin'); ?>
+                    <?php esc_html_e('Built-in Post Types', 'faq-ai-generator'); ?>
                 </th>
                 <td>
                     <?php
@@ -165,30 +164,29 @@ $model_options = Faq_Ai_Generator_Models::get_model_options();
                     <label>
                         <input type="checkbox" name="faq_ai_generator_settings[enabled_post_types][post]" value="1"
                             readonly="readonly" class="readonly-checkbox" <?php checked($enabled_post_types['post'], true); ?>>
-                        <?php esc_html_e('Posts', 'faq-ai-generator-plugin'); ?>
-                        <span
-                            class="description"><?php esc_html_e('(Sempre abilitato)', 'faq-ai-generator-plugin'); ?></span>
+                        <?php esc_html_e('Posts', 'faq-ai-generator'); ?>
+                        <span class="description"><?php esc_html_e('(Sempre abilitato)', 'faq-ai-generator'); ?></span>
                     </label><br>
                     <label>
                         <input type="checkbox" name="faq_ai_generator_settings[enabled_post_types][page]" value="1"
                             <?php checked($enabled_post_types['page'], true); ?>>
-                        <?php esc_html_e('Pages', 'faq-ai-generator-plugin'); ?>
+                        <?php esc_html_e('Pages', 'faq-ai-generator'); ?>
                     </label>
                 </td>
             </tr>
 
             <tr>
                 <th scope="row">
-                    <label for="debug_mode"><?php esc_html_e('Debug Mode', 'faq-ai-generator-plugin'); ?></label>
+                    <label for="debug_mode"><?php esc_html_e('Debug Mode', 'faq-ai-generator'); ?></label>
                 </th>
                 <td>
                     <label>
                         <input type="checkbox" id="debug_mode" name="faq_ai_generator_settings[debug_mode]" value="1"
-                            <?php checked(isset($settings['debug_mode']) ? $settings['debug_mode'] : false, true); ?>>
-                        <?php esc_html_e('Enable debug mode', 'faq-ai-generator-plugin'); ?>
+                            <?php checked($settings['debug_mode'] ?? false, true); ?>>
+                        <?php esc_html_e('Enable debug mode', 'faq-ai-generator'); ?>
                     </label>
                     <p class="description">
-                        <?php esc_html_e('Enable this option to log debug information to the WordPress debug log. Use this only for development and troubleshooting.', 'faq-ai-generator-plugin'); ?>
+                        <?php esc_html_e('Enable this option to log debug information to the WordPress debug log. Use this only for development and troubleshooting.', 'faq-ai-generator'); ?>
                     </p>
                 </td>
             </tr>
