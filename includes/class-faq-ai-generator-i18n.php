@@ -24,7 +24,8 @@
  * @subpackage Faq_Ai_Generator/includes
  * @author     Luca Mainieri <info@neting.it>
  */
-class Faq_Ai_Generator_i18n {
+class Faq_Ai_Generator_i18n
+{
 
 
 	/**
@@ -32,12 +33,13 @@ class Faq_Ai_Generator_i18n {
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain()
+	{
 
 		load_plugin_textdomain(
-			'faq-ai-generator',
+			'faq-ai-generator-plugin',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
 		);
 
 	}

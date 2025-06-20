@@ -25,18 +25,15 @@ $faqs = isset($faq_data['faqs']) ? $faq_data['faqs'] : [];
     <div class="faq-ai-generator-controls">
         <div class="faq-ai-actions">
             <button type="button" id="faq-ai-generate" class="button button-primary">
-                <?php esc_html_e('Generate FAQ', 'faq-ai-generator'); ?>
+                <?php esc_html_e('Generate FAQ', 'faq-ai-generator-plugin'); ?>
             </button>
         </div>
     </div>
 
     <div class="faq-ai-generator-display-option">
         <label>
-            <input type="checkbox" 
-                   name="faq_ai_display_in_content" 
-                   value="1" 
-                   <?php checked($display_in_content, true); ?>>
-            <?php esc_html_e('Show FAQ in content', 'faq-ai-generator'); ?>
+            <input type="checkbox" name="faq_ai_display_in_content" value="1" <?php checked($display_in_content, true); ?>>
+            <?php esc_html_e('Show FAQ in content', 'faq-ai-generator-plugin'); ?>
         </label>
     </div>
 
@@ -44,17 +41,15 @@ $faqs = isset($faq_data['faqs']) ? $faq_data['faqs'] : [];
         <?php foreach ($faqs as $index => $faq): ?>
             <div class="faq-item" data-index="<?php echo esc_attr($index); ?>">
                 <div class="faq-question">
-                    <input type="text" 
-                           name="faq_ai_questions[]" 
-                           value="<?php echo esc_attr($faq['question']); ?>" 
-                           placeholder="<?php esc_attr_e('Question', 'faq-ai-generator'); ?>">
+                    <input type="text" name="faq_ai_questions[]" value="<?php echo esc_attr($faq['question']); ?>"
+                        placeholder="<?php esc_attr_e('Question', 'faq-ai-generator-plugin'); ?>">
                 </div>
                 <div class="faq-answer">
-                    <textarea name="faq_ai_answers[]" 
-                              placeholder="<?php esc_attr_e('Answer', 'faq-ai-generator'); ?>"><?php echo esc_textarea($faq['answer']); ?></textarea>
+                    <textarea name="faq_ai_answers[]"
+                        placeholder="<?php esc_attr_e('Answer', 'faq-ai-generator-plugin'); ?>"><?php echo esc_textarea($faq['answer']); ?></textarea>
                 </div>
                 <button type="button" class="button faq-remove">
-                    <?php esc_html_e('Remove', 'faq-ai-generator'); ?>
+                    <?php esc_html_e('Remove', 'faq-ai-generator-plugin'); ?>
                 </button>
             </div>
         <?php endforeach; ?>
@@ -62,7 +57,7 @@ $faqs = isset($faq_data['faqs']) ? $faq_data['faqs'] : [];
 
     <div class="faq-ai-generator-add">
         <button type="button" class="button" id="faq-ai-add">
-            <?php esc_html_e('Add new FAQ', 'faq-ai-generator'); ?>
+            <?php esc_html_e('Add new FAQ', 'faq-ai-generator-plugin'); ?>
         </button>
     </div>
 
@@ -71,19 +66,19 @@ $faqs = isset($faq_data['faqs']) ? $faq_data['faqs'] : [];
     <!-- Popup di conferma -->
     <div id="faq-ai-confirm-dialog" style="display: none;">
         <div class="faq-ai-confirm-content">
-            <h3><?php esc_html_e('Confirm FAQ generation', 'faq-ai-generator'); ?></h3>
-            <p><?php esc_html_e('Choose how to proceed with FAQ generation:', 'faq-ai-generator'); ?></p>
+            <h3><?php esc_html_e('Confirm FAQ generation', 'faq-ai-generator-plugin'); ?></h3>
+            <p><?php esc_html_e('Choose how to proceed with FAQ generation:', 'faq-ai-generator-plugin'); ?></p>
             <div class="faq-ai-confirm-buttons">
-                <?php if (!empty($faqs)) : ?>
-                <button type="button" id="faq-ai-overwrite" class="button button-primary">
-                    <?php esc_html_e('Overwrite existing FAQs', 'faq-ai-generator'); ?>
-                </button>
+                <?php if (!empty($faqs)): ?>
+                    <button type="button" id="faq-ai-overwrite" class="button button-primary">
+                        <?php esc_html_e('Overwrite existing FAQs', 'faq-ai-generator-plugin'); ?>
+                    </button>
                 <?php endif; ?>
                 <button type="button" id="faq-ai-append" class="button button-primary">
-                    <?php esc_html_e('Add new FAQs', 'faq-ai-generator'); ?>
+                    <?php esc_html_e('Add new FAQs', 'faq-ai-generator-plugin'); ?>
                 </button>
                 <button type="button" id="faq-ai-cancel" class="button">
-                    <?php esc_html_e('Cancel', 'faq-ai-generator'); ?>
+                    <?php esc_html_e('Cancel', 'faq-ai-generator-plugin'); ?>
                 </button>
             </div>
         </div>
@@ -93,157 +88,3 @@ $faqs = isset($faq_data['faqs']) ? $faq_data['faqs'] : [];
         <!-- Messaggi di notifica -->
     </div>
 </div>
-
-<style>
-.faq-ai-generator-metabox {
-    padding: 10px;
-}
-
-.faq-ai-generator-controls {
-    margin-bottom: 15px;
-}
-
-.faq-ai-generator-display-option {
-    margin-bottom: 15px;
-}
-
-.faq-ai-generator-add {
-    margin-top: 15px;
-}
-
-.faq-item {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    background: #fff;
-}
-
-.faq-question input,
-.faq-answer textarea {
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.faq-answer textarea {
-    height: 100px;
-}
-
-.faq-remove {
-    margin-top: 5px;
-}
-
-#faq-ai-confirm-dialog {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.faq-ai-confirm-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    max-width: 500px;
-    width: 90%;
-}
-.faq-ai-confirm-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-</style>
-
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    var shouldAppend = false;
-
-    // Funzione per mostrare il popup di conferma
-    function showConfirmDialog() {
-        $('#faq-ai-confirm-dialog').show();
-    }
-
-    // Funzione per nascondere il popup di conferma
-    function hideConfirmDialog() {
-        $('#faq-ai-confirm-dialog').hide();
-    }
-
-    // Gestione del click sul bottone Genera FAQ
-    $('#faq-ai-generate').on('click', function(e) {
-        e.preventDefault();
-        showConfirmDialog();
-    });
-
-    // Gestione del click su Sovrascrivi
-    $('#faq-ai-overwrite').on('click', function() {
-        shouldAppend = false;
-        hideConfirmDialog();
-        generateNewFaqs();
-    });
-
-    // Gestione del click su Aggiungi
-    $('#faq-ai-append').on('click', function() {
-        shouldAppend = true;
-        hideConfirmDialog();
-        generateNewFaqs();
-    });
-
-    // Gestione del click su Annulla
-    $('#faq-ai-cancel').on('click', function() {
-        hideConfirmDialog();
-    });
-
-    // Funzione per generare nuove FAQ
-    function generateNewFaqs() {
-        var $button = $('#faq-ai-generate');
-        var originalText = $button.html();
-        
-        $button.prop('disabled', true).html('<span class="dashicons dashicons-update spinning"></span> <?php esc_html_e('Generating...', 'faq-ai-generator'); ?>');
-
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'generate_faqs',
-                post_id: '<?php echo esc_attr($post->ID); ?>',
-                nonce: '<?php echo esc_attr(wp_create_nonce('faq_ai_nonce')); ?>',
-                append: shouldAppend ? 'true' : 'false'
-            },
-            success: function(response) {
-                if (response.success) {
-                    var faqsHtml = '';
-                    
-                    // Se dobbiamo aggiungere, manteniamo le FAQ esistenti
-                    if (shouldAppend) {
-                        // Manteniamo le FAQ esistenti
-                        $('.faq-ai-generator-list .faq-item').each(function() {
-                            faqsHtml += $(this).prop('outerHTML');
-                        });
-                    }
-
-                    // Aggiungiamo le nuove FAQ
-                    response.data.faqs.forEach(function(faq, index) {
-                        faqsHtml += generateFaqHtml($('.faq-item').length + index, faq.question, faq.answer);
-                    });
-
-                    $('.faq-ai-generator-list').html(faqsHtml);
-                    $('#faq-ai-message').html('<div class="notice notice-success"><p><?php esc_html_e('FAQs generated successfully!', 'faq-ai-generator'); ?></p></div>');
-                } else {
-                    $('#faq-ai-message').html('<div class="notice notice-error"><p><?php esc_html_e('An error occurred while generating FAQs.', 'faq-ai-generator'); ?></p></div>');
-                }
-            },
-            error: function() {
-                $('#faq-ai-message').html('<div class="notice notice-error"><p><?php esc_html_e('An error occurred while generating FAQs.', 'faq-ai-generator'); ?></p></div>');
-            },
-            complete: function() {
-                $button.prop('disabled', false).html(originalText);
-            }
-        });
-    }
-});
-</script> 

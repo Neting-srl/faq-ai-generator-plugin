@@ -27,7 +27,8 @@
  * @subpackage Faq_Ai_Generator/includes
  * @author     Luca Mainieri <info@neting.it>
  */
-class Faq_Ai_Generator {
+class Faq_Ai_Generator
+{
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -66,13 +67,14 @@ class Faq_Ai_Generator {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		if ( defined( 'FAQ_AI_GENERATOR_VERSION' ) ) {
+	public function __construct()
+	{
+		if (defined('FAQ_AI_GENERATOR_VERSION')) {
 			$this->version = FAQ_AI_GENERATOR_VERSION;
 		} else {
 			$this->version = '1.1.0';
 		}
-		$this->plugin_name = 'faq-ai-generator';
+		$this->plugin_name = 'faq-ai-generator-plugin';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -97,35 +99,36 @@ class Faq_Ai_Generator {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies()
+	{
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-faq-ai-generator-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-faq-ai-generator-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-faq-ai-generator-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-faq-ai-generator-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-faq-ai-generator-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-faq-ai-generator-public.php';
 
 		/**
 		 * The class responsible for handling Schema.org markup
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-faq-ai-generator-schema.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-faq-ai-generator-schema.php';
 
 		$this->loader = new Faq_Ai_Generator_Loader();
 
@@ -140,11 +143,12 @@ class Faq_Ai_Generator {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale()
+	{
 
 		$plugin_i18n = new Faq_Ai_Generator_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 
 	}
 
@@ -155,17 +159,18 @@ class Faq_Ai_Generator {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks()
+	{
 
-		$plugin_admin = new Faq_Ai_Generator_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Faq_Ai_Generator_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
-		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'add_faq_meta_box' );
-		$this->loader->add_action( 'wp_ajax_faq_ai_generate', $plugin_admin, 'ajax_generate_faqs' );
-		$this->loader->add_action( 'save_post', $plugin_admin, 'save_faq_data' );
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
+		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'add_faq_meta_box');
+		$this->loader->add_action('wp_ajax_faq_ai_generate', $plugin_admin, 'ajax_generate_faqs');
+		$this->loader->add_action('save_post', $plugin_admin, 'save_faq_data');
 
 	}
 
@@ -176,15 +181,16 @@ class Faq_Ai_Generator {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks()
+	{
 
-		$plugin_public = new Faq_Ai_Generator_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Faq_Ai_Generator_Public($this->get_plugin_name(), $this->get_version());
 		$plugin_schema = new Faq_Ai_Generator_Schema();
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_filter( 'the_content', $plugin_public, 'display_faqs_in_content' );
-		$this->loader->add_action( 'wp_head', $plugin_public, 'add_faq_schema', 1 );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+		$this->loader->add_filter('the_content', $plugin_public, 'display_faqs_in_content');
+		$this->loader->add_action('wp_head', $plugin_public, 'add_faq_schema', 1);
 
 	}
 
@@ -193,7 +199,8 @@ class Faq_Ai_Generator {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run()
+	{
 		$this->loader->run();
 	}
 
@@ -204,7 +211,8 @@ class Faq_Ai_Generator {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name()
+	{
 		return $this->plugin_name;
 	}
 
@@ -214,7 +222,8 @@ class Faq_Ai_Generator {
 	 * @since     1.0.0
 	 * @return    Faq_Ai_Generator_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader()
+	{
 		return $this->loader;
 	}
 
@@ -224,7 +233,8 @@ class Faq_Ai_Generator {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version()
+	{
 		return $this->version;
 	}
 
