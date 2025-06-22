@@ -178,7 +178,7 @@ class Faq_Ai_Generator_Public
 	}
 
 	/**
-	 * Aggiunge lo schema.org delle FAQ
+	 * Add the schema.org for the FAQ
 	 *
 	 * @since    1.0.0
 	 */
@@ -188,14 +188,14 @@ class Faq_Ai_Generator_Public
 			return;
 		}
 
-		// Recupera il post type corrente
+		// Get the current post type
 		$current_post_type = get_post_type();
 
-		// Recupera le impostazioni
+		// Get the settings
 		$settings = get_option('faq_ai_generator_settings', array());
 		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
 
-		// Verifica se il post type è abilitato
+		// Check if the post type is enabled
 		$is_enabled = $current_post_type === 'post' ||
 			$current_post_type === 'page' ||
 			(isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
@@ -228,9 +228,20 @@ class Faq_Ai_Generator_Public
 			);
 		}
 
-		// Stampa lo schema JSON-LD con i tag script
+		// Generate the JSON-LD for the schema.org
+		// $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+		$settings = get_option('faq_ai_generator_settings', array());
+		if (isset($settings['debug']) && $settings['debug']) {
+			$flags = JSON_PRETTY_PRINT;
+		}
+		// JSON_UNESCAPED_UNICODE is necessary to avoid issues with special characters
+		$json_data = wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+		// Print the JSON-LD schema directly
 		echo "\n<!-- FAQ AI Generator Schema -->\n";
-		echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+		// We don't use esc_html here because it would convert special characters into HTML entities
+		// that are not appropriate in a script tag. wp_json_encode has already sanitized the output.
+		echo '<script type="application/ld+json" id="faq-ai-schema">' . $json_data . '</script>' . "\n";
 	}
 
 }
