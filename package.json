@@ -1,4 +1,21 @@
 {
+  "name": "faq-ai-generator",
+  "version": "1.0.0",
+  "description": "Automatically generate FAQs for your WordPress content using artificial intelligence.",
+  "author": "netingweb",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/netingweb/faq-ai-generator-plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/netingweb/faq-ai-generator-plugin.git"
+  },
+  "keywords": [
+    "faq",
+    "ai",
+    "openai",
+    "schema.org",
+    "acf"
+  ],
   "devDependencies": {
     "@wordpress/scripts": "^30.18.0"
   },

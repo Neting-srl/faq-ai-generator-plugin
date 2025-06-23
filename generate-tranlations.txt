@@ -1,0 +1,32 @@
+# Generate translations
+
+## 0. Install globally the WP CLI:
+
+```
+composer global require wp-cli/wp-cli-bundle
+```
+
+## 1. Generate POT file
+
+For Windows use git bash.
+
+```
+wp i18n make-pot . languages/faq-ai-generator.pot
+```
+
+## 2. Generate PO file from POT file
+
+For Windows use git bash.
+
+```
+wp i18n update-po languages/faq-ai-generator.pot
+```
+
+## 3. Generate MO file from PO file
+
+For Windows use git bash.
+
+```
+wp i18n make-mo languages/.
+```
+
