@@ -22,37 +22,37 @@ class Faq_Ai_Generator_Models
         return array(
             'gpt-3.5-turbo' => array(
                 'name' => 'GPT-3.5 Turbo (16K)',
-                'description' => __('Versione estesa di GPT-3.5 con contesto più ampio, ideale per contenuti lunghi', 'faq-ai-generator'),
+                'description' => __('Extended version of GPT-3.5 with a larger context, ideal for long content', 'faq-ai-generator'),
                 'max_tokens' => 16384,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-3-5-turbo'
             ),
             'gpt-4' => array(
                 'name' => 'GPT-4 (8K)',
-                'description' => __('Versione estesa di GPT-4 con contesto molto ampio, ottimo per analisi approfondite', 'faq-ai-generator'),
+                'description' => __('Extended version of GPT-4 with a much larger context, great for in-depth analysis', 'faq-ai-generator'),
                 'max_tokens' => 8192,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-4'
             ),
             'gpt-4-turbo' => array(
                 'name' => 'GPT-4 Turbo (128K)',
-                'description' => __('Versione ottimizzata di GPT-4 per prestazioni più veloci e contesto ampio', 'faq-ai-generator'),
+                'description' => __('Optimized version of GPT-4 for faster performance and large context', 'faq-ai-generator'),
                 'max_tokens' => 128000,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-4-turbo'
             ),
             'gpt-4o' => array(
                 'name' => 'GPT-4o (128K)',
-                'description' => __('Versione stabile di GPT-4 con ottimo bilanciamento tra qualità e contesto', 'faq-ai-generator'),
+                'description' => __('Stable version of GPT-4 with excellent balance between quality and context', 'faq-ai-generator'),
                 'max_tokens' => 128000,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-4o'
             ),
             'gpt-4o-mini' => array(
                 'name' => 'GPT-4o Mini (128K)',
-                'description' => __('Versione mini di GPT-4o per prestazioni veloci e costi ridotti', 'faq-ai-generator'),
+                'description' => __('Mini version of GPT-4o for fast performance and reduced costs', 'faq-ai-generator'),
                 'max_tokens' => 128000,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-4o-mini'
             ),
             'gpt-4.1' => array(
                 'name' => 'GPT-4.1 (1M)',
-                'description' => __('Versione stabile di GPT-4.1 con contesto molto ampio, ottimo per analisi approfondite', 'faq-ai-generator'),
+                'description' => __('Stable version of GPT-4.1 with a very large context, great for in-depth analysis', 'faq-ai-generator'),
                 'max_tokens' => 1047576,
                 'model_link' => 'https://platform.openai.com/docs/models/gpt-4.1'
             ),

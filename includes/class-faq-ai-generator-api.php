@@ -160,15 +160,11 @@ class Faq_Ai_Generator_Api
      */
     private function get_page_content_via_curl($post_id)
     {
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('Starting content extraction for post ID: ' . $post_id);
-        }
+        Faq_Ai_Generator_Logger::debug('Starting content extraction for post ID: ' . $post_id);
 
         // Ottieni l'URL della pagina
         $page_url = get_permalink($post_id);
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('Page URL: ' . $page_url);
-        }
+        Faq_Ai_Generator_Logger::debug('Page URL: ' . $page_url);
 
         // Esegui la richiesta usando wp_remote_get
         $response = wp_remote_get($page_url, array(
@@ -185,9 +181,7 @@ class Faq_Ai_Generator_Api
 
         // Ottieni il contenuto HTML
         $html = wp_remote_retrieve_body($response);
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('HTML content length: ' . strlen($html));
-        }
+        Faq_Ai_Generator_Logger::debug('HTML content length: ' . strlen($html));
 
         // Estrai il contenuto principale
         $dom = new DOMDocument();
@@ -210,15 +204,11 @@ class Faq_Ai_Generator_Api
         $main = $dom->getElementsByTagName('main')->item(0);
 
         if ($main) {
-            if (FAQ_AI_DEBUG) {
-                Faq_Ai_Generator_Logger::debug('Found main tag content');
-            }
+            Faq_Ai_Generator_Logger::debug('Found main tag content');
             // Converti il contenuto in markdown
             $content = $this->html_to_markdown($main);
         } else {
-            if (FAQ_AI_DEBUG) {
-                Faq_Ai_Generator_Logger::debug('Main tag not found, trying fallback selectors');
-            }
+            Faq_Ai_Generator_Logger::debug('Main tag not found, trying fallback selectors');
             // Fallback: cerca altri contenitori comuni
             $selectors = array(
                 'article',
@@ -231,9 +221,7 @@ class Faq_Ai_Generator_Api
             );
 
             foreach ($selectors as $selector) {
-                if (FAQ_AI_DEBUG) {
-                    Faq_Ai_Generator_Logger::debug('Trying selector: ' . $selector);
-                }
+                Faq_Ai_Generator_Logger::debug('Trying selector: ' . $selector);
                 if (strpos($selector, '#') === 0) {
                     $element = $dom->getElementById(substr($selector, 1));
                 } else if (strpos($selector, '.') === 0) {
@@ -241,9 +229,7 @@ class Faq_Ai_Generator_Api
                     foreach ($elements as $element) {
                         if (strpos($element->getAttribute('class'), substr($selector, 1)) !== false) {
                             $content = $this->html_to_markdown($element);
-                            if (FAQ_AI_DEBUG) {
-                                Faq_Ai_Generator_Logger::debug('Found content in class: ' . $selector);
-                            }
+                            Faq_Ai_Generator_Logger::debug('Found content in class: ' . $selector);
                             break 2;
                         }
                     }
@@ -253,24 +239,33 @@ class Faq_Ai_Generator_Api
 
                 if ($element) {
                     $content = $this->html_to_markdown($element);
-                    if (FAQ_AI_DEBUG) {
-                        Faq_Ai_Generator_Logger::debug('Found content in tag: ' . $selector);
-                    }
+                    Faq_Ai_Generator_Logger::debug('Found content in tag: ' . $selector);
                     break;
                 }
             }
         }
 
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('HTML content length after extraction: ' . strlen($content));
-        }
+        Faq_Ai_Generator_Logger::debug('HTML content length after extraction: ' . strlen($content));
 
         // Recupera i dati ACF in modo flessibile
         $acf_content = '';
-        if (function_exists('get_fields')) {
-            if (FAQ_AI_DEBUG) {
-                Faq_Ai_Generator_Logger::debug('ACF plugin is active, attempting to get fields');
-            }
+
+        // Verifica se il plugin ACF è installato e attivo
+        $acf_active = false;
+
+        // Verifica tramite is_plugin_active se disponibile
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
+        if (function_exists('is_plugin_active')) {
+            $acf_active = is_plugin_active('advanced-custom-fields/acf.php') ||
+                is_plugin_active('advanced-custom-fields-pro/acf.php');
+        }
+
+        // Verifica anche tramite la funzione get_fields
+        if ($acf_active && function_exists('get_fields')) {
+            Faq_Ai_Generator_Logger::debug('ACF plugin is active, attempting to get fields');
 
             $fields = get_fields($post_id);
             if ($fields) {
@@ -383,25 +378,17 @@ class Faq_Ai_Generator_Api
                     }
                 }
             } else {
-                if (FAQ_AI_DEBUG) {
-                    Faq_Ai_Generator_Logger::debug('No ACF fields found for post ID: ' . $post_id);
-                }
+                Faq_Ai_Generator_Logger::debug('No ACF fields found for post ID: ' . $post_id);
             }
         } else {
-            if (FAQ_AI_DEBUG) {
-                Faq_Ai_Generator_Logger::debug('ACF plugin not active');
-            }
+            Faq_Ai_Generator_Logger::debug('ACF plugin not active');
         }
 
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('ACF content length: ' . strlen($acf_content));
-        }
+        Faq_Ai_Generator_Logger::debug('ACF content length: ' . strlen($acf_content));
 
         // Combina il contenuto HTML con i dati ACF
         if (!empty($acf_content)) {
-            if (FAQ_AI_DEBUG) {
-                Faq_Ai_Generator_Logger::debug('Adding ACF content to main content');
-            }
+            Faq_Ai_Generator_Logger::debug('Adding ACF content to main content');
             $content .= "\n\n" . $acf_content;
         }
 
@@ -409,11 +396,9 @@ class Faq_Ai_Generator_Api
         $content = preg_replace('/\s+/', ' ', $content);
         $content = trim($content);
 
-        if (FAQ_AI_DEBUG) {
-            Faq_Ai_Generator_Logger::debug('Final content length: ' . strlen($content));
-            if (empty($content)) {
-                Faq_Ai_Generator_Logger::warning('WARNING: Final content is empty!');
-            }
+        Faq_Ai_Generator_Logger::debug('Final content length: ' . strlen($content));
+        if (empty($content)) {
+            Faq_Ai_Generator_Logger::warning('WARNING: Final content is empty!');
         }
 
         return $content;
@@ -763,7 +748,7 @@ class Faq_Ai_Generator_Api
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
             if (strpos($error_message, 'Operation timed out') !== false) {
-                return new WP_Error('timeout', __('La richiesta ha impiegato troppo tempo. Per favore riprova più tardi.', 'faq-ai-generator'));
+                return new WP_Error('timeout', __('The request took too long. Please try again later.', 'faq-ai-generator'));
             }
             $context = [
                 'error_message' => $error_message,

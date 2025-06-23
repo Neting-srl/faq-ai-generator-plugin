@@ -228,20 +228,11 @@ class Faq_Ai_Generator_Public
 			);
 		}
 
-		// Generate the JSON-LD for the schema.org
-		// $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
-		$settings = get_option('faq_ai_generator_settings', array());
-		if (isset($settings['debug']) && $settings['debug']) {
-			$flags = JSON_PRETTY_PRINT;
-		}
-		// JSON_UNESCAPED_UNICODE is necessary to avoid issues with special characters
-		$json_data = wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
 
 		// Print the JSON-LD schema directly
 		echo "\n<!-- FAQ AI Generator Schema -->\n";
-		// We don't use esc_html here because it would convert special characters into HTML entities
-		// that are not appropriate in a script tag. wp_json_encode has already sanitized the output.
-		echo '<script type="application/ld+json" id="faq-ai-schema">' . $json_data . '</script>' . "\n";
+		echo '<script type="application/ld+json" id="faq-ai-schema">' . wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
 	}
 
 }

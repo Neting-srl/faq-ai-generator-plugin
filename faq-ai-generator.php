@@ -10,7 +10,7 @@
  * @wordpress-plugin
  * Plugin Name:       FAQ AI Generator
  * Plugin URI:        https://github.com/netingweb/faq-ai-generator-plugin
- * Description:       Genera automaticamente FAQ per i tuoi contenuti WordPress utilizzando l'intelligenza artificiale.
+ * Description:       Automatically generate FAQs for your WordPress content using artificial intelligence.
  * Version:           1.1.4
  * Requires at least: 5.0
  * Tested up to:      6.4
