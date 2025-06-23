@@ -2,344 +2,283 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FAQ AI Generator 1.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/faq-ai-generator\n"
-"POT-Creation-Date: 2024-03-21 12:00+0000\n"
-"PO-Revision-Date: 2024-03-21 12:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-03-21 12:00+0000\n"
+"PO-Revision-Date: 2024-03-21 12:00+0000\n"
+"Language: it_IT\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.4.2\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: .git\n"
 "X-Poedit-SearchPathExcluded-1: languages\n"
 
+#. Plugin Name of the plugin
+#: faq-ai-generator.php
+#: admin/class-faq-ai-generator-admin.php:112
+#: admin/class-faq-ai-generator-admin.php:113
+#: admin/class-faq-ai-generator-admin.php:239
 msgid "FAQ AI Generator"
 msgstr "FAQ AI Generator"
 
-msgid "Automatically generate relevant FAQs for your articles, pages, and custom post types using OpenAI's AI."
-msgstr "Genera automaticamente FAQ pertinenti per i tuoi articoli, pagine e custom post type utilizzando l'AI di OpenAI."
-
-msgid "FAQ AI Generator is a WordPress plugin that uses OpenAI's artificial intelligence to automatically generate relevant questions and answers (FAQs) based on your articles, pages, and custom post types content."
-msgstr "FAQ AI Generator è un plugin WordPress che utilizza l'intelligenza artificiale di OpenAI per generare automaticamente domande e risposte pertinenti (FAQ) basate sul contenuto dei tuoi articoli, pagine e custom post type."
-
-msgid "Key Features:"
-msgstr "Caratteristiche principali:"
-
-msgid "Automatic FAQ generation using OpenAI GPT"
-msgstr "Generazione automatica di FAQ utilizzando OpenAI GPT"
-
-msgid "Support for multiple AI models (GPT-3.5 Turbo, GPT-4, GPT-4.1 Mini, GPT-4 Turbo, GPT-4o)"
-msgstr "Supporto per diversi modelli AI (GPT-3.5 Turbo, GPT-4, GPT-4.1 Mini, GPT-4 Turbo, GPT-4o)"
-
-msgid "Direct integration into article content"
-msgstr "Integrazione diretta nel contenuto dell'articolo"
-
-msgid "Support for posts, pages, and custom post types"
-msgstr "Supporto per articoli, pagine e custom post type"
-
-msgid "Intuitive user interface for FAQ management"
-msgstr "Interfaccia utente intuitiva per la gestione delle FAQ"
-
-msgid "Ability to manually edit generated FAQs"
-msgstr "Possibilità di modificare manualmente le FAQ generate"
-
-msgid "Option to show/hide FAQs in content"
-msgstr "Opzione per mostrare/nascondere le FAQ nel contenuto"
-
-msgid "Support for generating new FAQs while keeping existing ones"
-msgstr "Supporto per la generazione di nuove FAQ mantenendo quelle esistenti"
-
-msgid "Flexible configuration of supported content types"
-msgstr "Configurazione flessibile dei tipi di contenuto supportati"
-
-msgid "Installation"
-msgstr "Installazione"
-
-msgid "Upload the `faq-ai-generator` folder to the `/wp-content/plugins/` directory"
-msgstr "Carica la cartella `faq-ai-generator` nella directory `/wp-content/plugins/`"
-
-msgid "Activate the plugin through the 'Plugins' menu in WordPress"
-msgstr "Attiva il plugin attraverso il menu 'Plugin' in WordPress"
-
-msgid "Go to Settings > FAQ AI Generator"
-msgstr "Vai su Impostazioni > FAQ AI Generator"
-
-msgid "Enter your OpenAI API Key"
-msgstr "Inserisci la tua API Key di OpenAI"
-
-msgid "Select your preferred AI model"
-msgstr "Seleziona il modello AI preferito"
-
-msgid "Configure supported content types in settings"
-msgstr "Configura i tipi di contenuto supportati nelle impostazioni"
-
-msgid "Start generating FAQs for your content!"
-msgstr "Inizia a generare FAQ per i tuoi contenuti!"
-
+#: public/class-faq-ai-generator-public.php:161
 msgid "Frequently Asked Questions"
 msgstr "Domande Frequenti"
 
-msgid "How do I get an OpenAI API Key?"
-msgstr "Come ottengo una API Key di OpenAI?"
-
-msgid "You can get an API Key by signing up at https://platform.openai.com/api-keys. Once registered, you can generate a new API key to use with the plugin."
-msgstr "Puoi ottenere una API Key registrandoti su https://platform.openai.com/api-keys. Una volta registrato, potrai generare una nuova chiave API da utilizzare con il plugin."
-
-msgid "What content types are supported?"
-msgstr "Quali tipi di contenuto sono supportati?"
-
-msgid "The plugin supports by default:"
-msgstr "Il plugin supporta di default:"
-
-msgid "Posts (articles)"
-msgstr "Post (articoli)"
-
+#: admin/partials/settings-page.php:173
 msgid "Pages"
 msgstr "Pagine"
 
-msgid "Custom Post Types (configurable in settings)"
-msgstr "Custom Post Type (configurabili dalle impostazioni)"
-
-msgid "You can enable or disable support for specific content types from the plugin settings."
-msgstr "Puoi abilitare o disabilitare il supporto per specifici tipi di contenuto dalle impostazioni del plugin."
-
-msgid "How do I configure supported custom post types?"
-msgstr "Come configuro i custom post type supportati?"
-
-msgid "In the \"Supported Content Types\" section"
-msgstr "Nella sezione \"Tipi di contenuto supportati\""
-
-msgid "Select the custom post types you want to support"
-msgstr "Seleziona i custom post type che desideri supportare"
-
-msgid "Save settings"
-msgstr "Salva le impostazioni"
-
-msgid "What AI models are available?"
-msgstr "Quali modelli AI sono disponibili?"
-
-msgid "The plugin currently supports the following models:"
-msgstr "Il plugin supporta attualmente i seguenti modelli:"
-
-msgid "GPT-3.5 Turbo: fast and economical model"
-msgstr "GPT-3.5 Turbo: modello veloce ed economico"
-
-msgid "GPT-4: more advanced and accurate model"
-msgstr "GPT-4: modello più avanzato e preciso"
-
-msgid "GPT-4.1 Mini: compact version of GPT-4.1"
-msgstr "GPT-4.1 Mini: versione compatta di GPT-4.1"
-
-msgid "GPT-4 Turbo: optimized version for fast performance"
-msgstr "GPT-4 Turbo: versione ottimizzata per prestazioni veloci"
-
-msgid "GPT-4o: optimized version for concise output"
-msgstr "GPT-4o: versione ottimizzata per output concisi"
-
-msgid "Can I edit the generated FAQs?"
-msgstr "Posso modificare le FAQ generate?"
-
-msgid "Yes, you can manually edit any generated FAQ through the plugin interface in the content editor."
-msgstr "Sì, puoi modificare manualmente qualsiasi FAQ generata attraverso l'interfaccia del plugin nell'editor dei contenuti."
-
-msgid "Screenshots"
-msgstr "Screenshot"
-
-msgid "Plugin settings page with API Key and AI model configuration"
-msgstr "Pagina delle impostazioni del plugin con la configurazione dell'API Key e del modello AI"
-
-msgid "FAQ meta box in the article editor"
-msgstr "Meta box delle FAQ nell'editor degli articoli"
-
-msgid "Confirmation dialog for FAQ generation"
-msgstr "Dialogo di conferma per la generazione delle FAQ"
-
-msgid "FAQs integrated into article content"
-msgstr "FAQ integrate nel contenuto dell'articolo"
-
-msgid "Changelog"
-msgstr "Registro delle modifiche"
-
-msgid "Added support for WordPress pages"
-msgstr "Aggiunto supporto per le pagine WordPress"
-
-msgid "Added configurable support for custom post types"
-msgstr "Aggiunto supporto configurabile per i custom post type"
-
-msgid "Added configuration interface for supported content types"
-msgstr "Aggiunta interfaccia di configurazione per i tipi di contenuto supportati"
-
-msgid "Improved documentation"
-msgstr "Migliorata la documentazione"
-
-msgid "Updated compatibility with WordPress 6.8"
-msgstr "Aggiornata la compatibilità con WordPress 6.8"
-
-msgid "Initial plugin release"
-msgstr "Rilascio iniziale del plugin"
-
-msgid "Support for automatic FAQ generation"
-msgstr "Supporto per la generazione automatica di FAQ"
-
-msgid "OpenAI API integration"
-msgstr "Integrazione con OpenAI API"
-
-msgid "User interface for FAQ management"
-msgstr "Interfaccia utente per la gestione delle FAQ"
-
-msgid "Support for multiple AI models"
-msgstr "Supporto per diversi modelli AI"
-
-msgid "Added support for GPT-4.1 Mini"
-msgstr "Aggiunto supporto per GPT-4.1 Mini"
-
-msgid "Added support for GPT-4 Turbo"
-msgstr "Aggiunto supporto per GPT-4 Turbo"
-
-msgid "Added support for GPT-4o"
-msgstr "Aggiunto supporto per GPT-4o"
-
-msgid "Improved API error handling"
-msgstr "Migliorata la gestione degli errori API"
-
-msgid "Optimized user interface"
-msgstr "Ottimizzata l'interfaccia utente"
-
-msgid "Added ability to generate new FAQs while keeping existing ones"
-msgstr "Aggiunta la possibilità di generare nuove FAQ mantenendo quelle esistenti"
-
-msgid "Improved FAQ formatting in content"
-msgstr "Migliorata la formattazione delle FAQ nel contenuto"
-
-msgid "Added FAQ generation timestamp"
-msgstr "Aggiunto il timestamp di generazione delle FAQ"
-
-msgid "Optimized memory management for long content"
-msgstr "Ottimizzata la gestione della memoria per contenuti lunghi"
-
-msgid "Added support for GPT-4"
-msgstr "Aggiunto supporto per GPT-4"
-
-msgid "Improved quality of generated FAQs"
-msgstr "Migliorata la qualità delle FAQ generate"
-
-msgid "Implemented API Key validation"
-msgstr "Implementata la validazione dell'API Key"
-
-msgid "First public beta version"
-msgstr "Prima versione beta pubblica"
-
-msgid "Basic support for GPT-3.5 Turbo"
-msgstr "Supporto base per GPT-3.5 Turbo"
-
-msgid "Automatic FAQ generation"
-msgstr "Generazione automatica di FAQ"
-
-msgid "Integration into article content"
-msgstr "Integrazione nel contenuto degli articoli"
-
-msgid "Upgrade Notice"
-msgstr "Note di Aggiornamento"
-
-msgid "Added support for WordPress pages and custom post types. Updated compatibility with WordPress 6.8."
-msgstr "Aggiunto supporto per pagine WordPress e custom post type. Aggiornata la compatibilità con WordPress 6.8."
-
-msgid "First stable version of the FAQ AI Generator plugin. Includes all basic features for generating and managing FAQs using OpenAI's AI."
-msgstr "Prima versione stabile del plugin FAQ AI Generator. Include tutte le funzionalità base per la generazione e gestione delle FAQ utilizzando l'AI di OpenAI."
-
+#: admin/class-faq-ai-generator-admin.php:504
+#: includes/class-faq-ai-generator-api.php:92
+#: includes/class-faq-ai-generator-api.php:595
 msgid "API key not configured"
 msgstr "Chiave API non configurata"
 
+#: includes/class-faq-ai-generator-api.php:862
 msgid "Invalid API response"
 msgstr "Risposta API non valida"
 
+#: includes/class-faq-ai-generator-api.php:934
 msgid "No FAQs found in the response"
 msgstr "Nessuna FAQ trovata nella risposta"
 
+#: admin/class-faq-ai-generator-admin.php:289
 msgid "Post not found"
 msgstr "Post non trovato"
 
-msgid "FAQ generated with %1$s on %2$s at %3$s"
-msgstr "FAQ generate con %1$s il %2$s alle %3$s"
-
+#: admin/class-faq-ai-generator-admin.php:350
 msgid "Insufficient permissions"
 msgstr "Permessi insufficienti"
 
+#: admin/class-faq-ai-generator-admin.php:367
 msgid "Invalid FAQ format"
 msgstr "Formato FAQ non valido"
 
+#: admin/class-faq-ai-generator-admin.php:396
 msgid "Error while saving FAQs"
 msgstr "Errore durante il salvataggio delle FAQ"
 
+#: admin/class-faq-ai-generator-admin.php:400
 msgid "FAQs saved successfully"
 msgstr "FAQ salvate con successo"
 
+#: admin/partials/metabox-template.php:67
 msgid "Confirm FAQ generation"
 msgstr "Conferma generazione FAQ"
 
+#: admin/partials/metabox-template.php:68
 msgid "Choose how to proceed with FAQ generation:"
 msgstr "Scegli come procedere con la generazione delle FAQ:"
 
+#: admin/partials/metabox-template.php:72
 msgid "Overwrite existing FAQs"
 msgstr "Sovrascrivi FAQ esistenti"
 
+#: admin/partials/metabox-template.php:58
 msgid "Add new FAQ"
 msgstr "Aggiungi nuova FAQ"
 
+#: admin/partials/metabox-template.php:79
 msgid "Cancel"
 msgstr "Annulla"
 
-msgid "Move up"
-msgstr "Sposta in alto"
-
-msgid "Move down"
-msgstr "Sposta in basso"
-
-msgid "Toggle panel: FAQ AI Generator"
-msgstr "Attiva/disattiva il pannello: FAQ AI Generator"
-
+#: admin/partials/metabox-template.php:28
 msgid "Generate FAQ"
 msgstr "Genera FAQ"
 
+#: admin/partials/metabox-template.php:36
 msgid "Show FAQ in content"
 msgstr "Mostra FAQ nel contenuto"
 
+#: admin/partials/settings-page.php:59
 msgid "OpenAI API Key"
 msgstr "Chiave API OpenAI"
 
+#: admin/partials/settings-page.php:70
 msgid "Enter your OpenAI API Key. You can get it from"
 msgstr "Inserisci la tua Chiave API OpenAI. Puoi ottenerla da"
 
+#: admin/partials/settings-page.php:78
 msgid "AI Provider"
 msgstr "Provider AI"
 
+#: admin/partials/settings-page.php:83
 msgid "OpenAI"
 msgstr "OpenAI"
 
+#: admin/partials/settings-page.php:91
 msgid "Model"
 msgstr "Modello"
 
-msgid "GPT-4"
-msgstr "GPT-4"
-
-msgid "More advanced and accurate model, ideal for complex content"
-msgstr "Modello più avanzato e preciso, ideale per contenuti complessi"
-
+#: admin/partials/settings-page.php:111
 msgid "Extra Prompt"
 msgstr "Prompt Extra"
 
-msgid "Extra instructions for the AI prompt (use with caution). These instructions will be added at the beginning of the prompt."
-msgstr "Istruzioni extra per il prompt AI (usare con cautela). Queste istruzioni verranno aggiunte all'inizio del prompt."
+#. Plugin URI of the plugin
+#: faq-ai-generator.php
+msgid "https://github.com/netingweb/faq-ai-generator-plugin"
+msgstr "https://github.com/netingweb/faq-ai-generator-plugin"
 
-msgid "cURL error 28: Operation timed out after 30002 milliseconds with 0 bytes received"
-msgstr "Errore cURL 28: Operazione scaduta dopo 30002 millisecondi senza ricevere dati"
+#. Author of the plugin
+#: faq-ai-generator.php
+msgid "netingweb"
+msgstr "netingweb"
 
+#. Author URI of the plugin
+#: faq-ai-generator.php
+msgid "https://profiles.wordpress.org/netingweb/"
+msgstr "https://profiles.wordpress.org/netingweb/"
+
+#: admin/class-faq-ai-generator-admin.php:261
+msgid "FAQ generated with"
+msgstr "FAQ generate con"
+
+#: admin/class-faq-ai-generator-admin.php:263
+msgid "on"
+msgstr "il"
+
+#: admin/class-faq-ai-generator-admin.php:265
+msgid "at"
+msgstr "il"
+
+#: admin/class-faq-ai-generator-admin.php:284
+#: admin/class-faq-ai-generator-admin.php:355
+msgid "Invalid post ID"
+msgstr "Post ID non valido"
+
+#: admin/partials/metabox-template.php:45
+msgid "Question"
+msgstr "Domanda"
+
+#: admin/partials/metabox-template.php:49
+msgid "Answer"
+msgstr "Risposta"
+
+#: admin/partials/metabox-template.php:51
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: admin/partials/metabox-template.php:76
+msgid "Add new FAQs"
+msgstr "Aggiungi nuove FAQ"
+
+#: admin/partials/settings-page.php:117
+msgid "Additional instructions that will be added at the beginning of the prompt."
+msgstr "Istruzioni aggiuntive che verranno aggiunte all'inizio del prompt."
+
+#: admin/partials/settings-page.php:124
+msgid "Custom Post Types"
+msgstr "Tipi di post personalizzati"
+
+#: admin/partials/settings-page.php:142
+msgid "No custom post types found."
+msgstr "Nessun tipo di post personalizzato trovato."
+
+#: admin/partials/settings-page.php:150
+msgid "Built-in Post Types"
+msgstr "Tipi di post predefiniti"
+
+#: admin/partials/settings-page.php:167
+msgid "Posts"
+msgstr "Post"
+
+#: admin/partials/settings-page.php:168
+msgid "(Sempre abilitato)"
+msgstr "(Sempre abilitato)"
+
+#: admin/partials/settings-page.php:180
+msgid "Debug Mode"
+msgstr "Modalità debug"
+
+#: admin/partials/settings-page.php:186
+msgid "Enable debug mode"
+msgstr "Abilita modalità debug"
+
+#: admin/partials/settings-page.php:189
+msgid "Enable this option to log debug information to the WordPress debug log. Use this only for development and troubleshooting."
+msgstr "Abilita questa opzione per registrare le informazioni di debug nel log di WordPress. Usa questa opzione solo per lo sviluppo e il troubleshooting."
+
+#: includes/class-faq-ai-generator-api.php:663
+msgid "Invalid post ID. The post does not exist."
+msgstr "Post ID non valido. Il post non esiste."
+
+#: includes/class-faq-ai-generator-api.php:671
+msgid "The post must be published or in draft status."
+msgstr "Il post deve essere pubblicato o in stato di bozza."
+
+#: includes/class-faq-ai-generator-api.php:679
+msgid "No content found to generate FAQs"
+msgstr "Nessun contenuto trovato per generare FAQ"
+
+#: includes/class-faq-ai-generator-api.php:689
+msgid "No post ID found. Please make sure you are on a post or page, or provide a valid post ID."
+msgstr "Nessun post ID trovato. Assicurati di essere su un post o una pagina, o di fornire un post ID valido."
+
+#. translators: %1$s: Response code, %2$s: Response body
+#: includes/class-faq-ai-generator-api.php:772
+#, php-format
+msgid "API error: %1$s - %2$s"
+msgstr "Errore API: %1$s - %2$s"
+
+#. translators: %s: JSON error message
+#: includes/class-faq-ai-generator-api.php:789
+#, php-format
+msgid "Error decoding API response: %s"
+msgstr "Errore nella decodifica della risposta API: %s"
+
+#: includes/class-faq-ai-generator-api.php:797
+msgid "Invalid API response structure"
+msgstr "Struttura della risposta API non valida"
+
+#. translators: %s: JSON error message
+#: includes/class-faq-ai-generator-api.php:826
+#, php-format
+msgid "Error decoding FAQ JSON: %s"
+msgstr "Errore nella decodifica del JSON delle FAQ: %s"
+
+#: includes/class-faq-ai-generator-api.php:831
+msgid "No valid FAQs found in response"
+msgstr "Nessuna FAQ valida trovata nella risposta"
+
+#: includes/class-faq-ai-generator-models.php:103
+msgid "Invalid model ID"
+msgstr "ID modello non valido"
+
+#. Description of the plugin
+#: faq-ai-generator.php
+msgid "Automatically generate FAQs for your WordPress content using artificial intelligence."
+msgstr "Genera automaticamente FAQ per i tuoi contenuti WordPress utilizzando l'intelligenza artificiale."
+
+#: includes/class-faq-ai-generator-api.php:751
 msgid "The request took too long. Please try again later."
-msgstr "La richiesta ha impiegato troppo tempo. Per favore riprova più tardi." 
+msgstr "La richiesta ha impiegato troppo tempo. Per favore riprova più tardi."
+
+#: includes/class-faq-ai-generator-models.php:25
+msgid "Extended version of GPT-3.5 with a larger context, ideal for long content"
+msgstr "Versione estesa di GPT-3.5 con contesto più ampio, ideale per contenuti lunghi"
+
+#: includes/class-faq-ai-generator-models.php:31
+msgid "Extended version of GPT-4 with a much larger context, great for in-depth analysis"
+msgstr "Versione estesa di GPT-4 con contesto molto ampio, ottimo per analisi approfondite"
+
+#: includes/class-faq-ai-generator-models.php:37
+msgid "Optimized version of GPT-4 for faster performance and large context"
+msgstr "Versione ottimizzata di GPT-4 per prestazioni più veloci e contesto ampio"
+
+#: includes/class-faq-ai-generator-models.php:43
+msgid "Stable version of GPT-4 with excellent balance between quality and context"
+msgstr "Versione stabile di GPT-4 con ottimo bilanciamento tra qualità e contesto"
+
+#: includes/class-faq-ai-generator-models.php:49
+msgid "Mini version of GPT-4o for fast performance and reduced costs"
+msgstr "Versione mini di GPT-4o per prestazioni veloci e costi ridotti"
+
+#: includes/class-faq-ai-generator-models.php:55
+msgid "Stable version of GPT-4.1 with a very large context, great for in-depth analysis"
+msgstr "Versione stabile di GPT-4.1 con contesto molto ampio, ottimo per analisi approfondite"

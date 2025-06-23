@@ -1,9 +1,10 @@
 <?php
 
 /**
- * The API handler class for FAQ AI Generator
+ * The API integration class
  *
  * @since      1.0.0
+ *
  * @package    Faq_Ai_Generator
  * @subpackage Faq_Ai_Generator/includes
  */
@@ -11,10 +12,11 @@
 // Definizione della costante di debug
 if (!defined('FAQ_AI_DEBUG')) {
     $settings = get_option('faq_ai_generator_settings', array());
-    define('FAQ_AI_DEBUG', isset($settings['debug_mode']) ? (bool)$settings['debug_mode'] : false);
+    define('FAQ_AI_DEBUG', isset($settings['debug_mode']) && $settings['debug_mode']);
 }
 
-class Faq_Ai_Generator_Api {
+class Faq_Ai_Generator_Api
+{
 
     /**
      * The OpenAI API endpoint
@@ -35,12 +37,46 @@ class Faq_Ai_Generator_Api {
     private $api_key;
 
     /**
+     * The model ID
+     *
+     * @since    1.1.4
+     * @access   private
+     * @var      string
+     */
+    private $model_id;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since    1.0.0
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->api_key = get_option('faq_ai_generator_settings')['api_key'] ?? '';
+        $this->model_id = get_option('faq_ai_generator_settings')['model'] ?? Faq_Ai_Generator_Models::get_default_model();
+    }
+
+    /**
+     * Generate nonce for AJAX requests
+     *
+     * @since    1.0.0
+     * @return   string    The generated nonce
+     */
+    public static function get_nonce()
+    {
+        return wp_create_nonce('faq_ai_nonce');
+    }
+
+    /**
+     * Verify nonce for AJAX requests
+     *
+     * @since    1.0.0
+     * @param    string    $nonce    The nonce to verify
+     * @return   bool               True if valid, false otherwise
+     */
+    public static function verify_nonce($nonce)
+    {
+        return wp_verify_nonce($nonce, 'faq_ai_nonce');
     }
 
     /**
@@ -50,31 +86,20 @@ class Faq_Ai_Generator_Api {
      * @param    string    $api_key    The API key to test
      * @return   bool|WP_Error        True if valid, WP_Error if invalid
      */
-    public function test_api_key($api_key = null) {
-        if ($api_key) {
-            $this->api_key = $api_key;
-        }
-
-        if (empty($this->api_key)) {
+    public static function test_api_key_static($api_key = null)
+    {
+        if (empty($api_key)) {
             return new WP_Error('no_api_key', __('API key not configured', 'faq-ai-generator'));
         }
 
-        $response = wp_remote_post($this->api_endpoint, [
+        $test_endpoint = 'https://api.openai.com/v1/models';
+
+        $response = wp_remote_get($test_endpoint, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->api_key,
+                'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type' => 'application/json',
             ],
-            'body' => json_encode([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => 'Test'
-                    ]
-                ],
-                'max_tokens' => 5
-            ]),
-            'timeout' => 60
+            'timeout' => 30
         ]);
 
         if (is_wp_error($response)) {
@@ -82,12 +107,18 @@ class Faq_Ai_Generator_Api {
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
-        
+
         if (isset($body['error'])) {
             return new WP_Error('api_error', $body['error']['message']);
         }
 
         return true;
+    }
+
+    public function test_api_key($api_key = null)
+    {
+        $this->api_key = $api_key;
+        return self::test_api_key_static($api_key);
     }
 
     /**
@@ -97,25 +128,26 @@ class Faq_Ai_Generator_Api {
      * @access   private
      * @return   string    Il prompt base
      */
-    private function get_base_prompt() {
+    private function get_base_prompt()
+    {
         $locale = get_locale();
-        
+
         if ($locale === 'en_US') {
             return "You are an SEO expert and professional copywriter with solid SEO skills. " .
-                   "Your task is to enhance existing articles and content on the site with in-depth questions " .
-                   "related to the page content. Your task is to read and understand the content and generate " .
-                   "a list of questions and answers (FAQ) that are useful for site visitors and provide information " .
-                   "related to the page content and that are based on the provided content.\n\n" .
-                   "IMPORTANT: The response MUST be in JSON format with this structure:\n" .
-                   '[{"question": "question1", "answer": "answer1"}, {"question": "question2", "answer": "answer2"}]\n\n';
+                "Your task is to enhance existing articles and content on the site with in-depth questions " .
+                "related to the page content. Your task is to read and understand the content and generate " .
+                "a list of questions and answers (FAQ) that are useful for site visitors and provide information " .
+                "related to the page content and that are based on the provided content.\n\n" .
+                "IMPORTANT: The response MUST be in JSON format with this structure:\n" .
+                '[{"question": "question1", "answer": "answer1"}, {"question": "question2", "answer": "answer2"}]\n\n';
         } else {
             return "Sei un esperto di SEO e un copywriting professionista con solide competenze di SEO. " .
-                   "Il tuo compito è integrare degli articoli e contenuti esistenti sul sito con domande di approfondimento " .
-                   "inerenti al contenuto della pagina. Il tuo compito è leggere e comprendere il contenuto e generare " .
-                   "un elenco di domande e risposte(FAQ) che siano utili per i visitatori del sito e che forniscano informazioni ".
-                   "relative al contenuto della pagina e che siano basate sul contenuto fornito.\n\n" .
-                   "IMPORTANTE: La risposta DEVE essere in formato JSON con questa struttura:\n" .
-                   '[{"question": "domanda1", "answer": "risposta1"}, {"question": "domanda2", "answer": "risposta2"}]\n\n';
+                "Il tuo compito è integrare degli articoli e contenuti esistenti sul sito con domande di approfondimento " .
+                "inerenti al contenuto della pagina. Il tuo compito è leggere e comprendere il contenuto e generare " .
+                "un elenco di domande e risposte(FAQ) che siano utili per i visitatori del sito e che forniscano informazioni " .
+                "relative al contenuto della pagina e che siano basate sul contenuto fornito.\n\n" .
+                "IMPORTANTE: La risposta DEVE essere in formato JSON con questa struttura:\n" .
+                '[{"question": "domanda1", "answer": "risposta1"}, {"question": "domanda2", "answer": "risposta2"}]\n\n';
         }
     }
 
@@ -126,17 +158,14 @@ class Faq_Ai_Generator_Api {
      * @param    int       $post_id    ID della pagina
      * @return   string               Contenuto della pagina
      */
-    private function get_page_content_via_curl($post_id) {
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Starting content extraction for post ID: ' . $post_id);
-        }
+    private function get_page_content_via_curl($post_id)
+    {
+        Faq_Ai_Generator_Logger::debug('Starting content extraction for post ID: ' . $post_id);
 
         // Ottieni l'URL della pagina
         $page_url = get_permalink($post_id);
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Page URL: ' . $page_url);
-        }
-        
+        Faq_Ai_Generator_Logger::debug('Page URL: ' . $page_url);
+
         // Esegui la richiesta usando wp_remote_get
         $response = wp_remote_get($page_url, array(
             'timeout' => 30,
@@ -146,46 +175,40 @@ class Faq_Ai_Generator_Api {
 
         // Verifica se ci sono errori
         if (is_wp_error($response)) {
-            error_log('FAQ AI Generator - WP Remote Error: ' . $response->get_error_message());
+            Faq_Ai_Generator_Logger::error('WP Remote Error: ' . $response->get_error_message());
             return '';
         }
 
         // Ottieni il contenuto HTML
         $html = wp_remote_retrieve_body($response);
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - HTML content length: ' . strlen($html));
-        }
-        
+        Faq_Ai_Generator_Logger::debug('HTML content length: ' . strlen($html));
+
         // Estrai il contenuto principale
         $dom = new DOMDocument();
         @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-        
+
         // Rimuovi script e stili
         $scripts = $dom->getElementsByTagName('script');
         $styles = $dom->getElementsByTagName('style');
-        
+
         foreach ($scripts as $script) {
             $script->parentNode->removeChild($script);
         }
-        
+
         foreach ($styles as $style) {
             $style->parentNode->removeChild($style);
         }
-        
+
         // Cerca il contenuto principale nel tag main
         $content = '';
         $main = $dom->getElementsByTagName('main')->item(0);
-        
+
         if ($main) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Found main tag content');
-            }
+            Faq_Ai_Generator_Logger::debug('Found main tag content');
             // Converti il contenuto in markdown
             $content = $this->html_to_markdown($main);
         } else {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Main tag not found, trying fallback selectors');
-            }
+            Faq_Ai_Generator_Logger::debug('Main tag not found, trying fallback selectors');
             // Fallback: cerca altri contenitori comuni
             $selectors = array(
                 'article',
@@ -196,11 +219,9 @@ class Faq_Ai_Generator_Api {
                 '.entry-content',
                 'section'
             );
-            
+
             foreach ($selectors as $selector) {
-                if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - Trying selector: ' . $selector);
-                }
+                Faq_Ai_Generator_Logger::debug('Trying selector: ' . $selector);
                 if (strpos($selector, '#') === 0) {
                     $element = $dom->getElementById(substr($selector, 1));
                 } else if (strpos($selector, '.') === 0) {
@@ -208,56 +229,72 @@ class Faq_Ai_Generator_Api {
                     foreach ($elements as $element) {
                         if (strpos($element->getAttribute('class'), substr($selector, 1)) !== false) {
                             $content = $this->html_to_markdown($element);
-                            if (FAQ_AI_DEBUG) {
-                                error_log('FAQ AI Generator - Found content in class: ' . $selector);
-                            }
+                            Faq_Ai_Generator_Logger::debug('Found content in class: ' . $selector);
                             break 2;
                         }
                     }
                 } else {
                     $element = $dom->getElementsByTagName($selector)->item(0);
                 }
-                
+
                 if ($element) {
                     $content = $this->html_to_markdown($element);
-                    if (FAQ_AI_DEBUG) {
-                        error_log('FAQ AI Generator - Found content in tag: ' . $selector);
-                    }
+                    Faq_Ai_Generator_Logger::debug('Found content in tag: ' . $selector);
                     break;
                 }
             }
         }
 
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - HTML content length after extraction: ' . strlen($content));
-        }
+        Faq_Ai_Generator_Logger::debug('HTML content length after extraction: ' . strlen($content));
 
         // Recupera i dati ACF in modo flessibile
         $acf_content = '';
-        if (function_exists('get_fields')) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - ACF plugin is active, attempting to get fields');
-            }
-            
+
+        // Verifica se il plugin ACF è installato e attivo
+        $acf_active = false;
+
+        // Verifica tramite is_plugin_active se disponibile
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
+        if (function_exists('is_plugin_active')) {
+            $acf_active = is_plugin_active('advanced-custom-fields/acf.php') ||
+                is_plugin_active('advanced-custom-fields-pro/acf.php');
+        }
+
+        // Verifica anche tramite la funzione get_fields
+        if ($acf_active && function_exists('get_fields')) {
+            Faq_Ai_Generator_Logger::debug('ACF plugin is active, attempting to get fields');
+
             $fields = get_fields($post_id);
             if ($fields) {
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - ACF Fields found: ' . count($fields));
-                    error_log('FAQ AI Generator - ACF Fields: ' . print_r(array_keys($fields), true));
-                    error_log('FAQ AI Generator - ACF Fields Raw Data: ' . print_r($fields, true));
+                    $context = [
+                        'count' => count($fields),
+                        'fields' => $fields,
+                        'post_id' => $post_id
+                    ];
+                    Faq_Ai_Generator_Logger::debug('ACF Fields', $context);
                 }
-                
+
                 // Funzione ricorsiva per estrarre il contenuto dai campi ACF
-                $extract_acf_content = function($field_value, $field_name = '', $field_type = '') use (&$extract_acf_content) {
+                $extract_acf_content = function ($field_value, $field_name = '', $field_type = '') use (&$extract_acf_content) {
                     $content = '';
-                    
+
                     if (is_string($field_value)) {
                         // Rimuovi HTML e pulisci il testo
                         $clean_text = wp_strip_all_tags($field_value);
                         if (!empty($clean_text)) {
                             $content .= $clean_text . "\n";
                             if (FAQ_AI_DEBUG) {
-                                error_log("FAQ AI Generator - ACF Field '{$field_name}' ({$field_type}): Text content found (" . strlen($clean_text) . " chars)");
+                                $context = [
+                                    'field_name' => $field_name,
+                                    'field_type' => $field_type,
+                                    'clean_text' => $clean_text,
+                                    'length' => strlen($clean_text)
+                                ];
+                                Faq_Ai_Generator_Logger::debug("ACF Field '{$field_name}' ({$field_type}): Text content found (" . strlen($clean_text) . " chars)", $context);
                             }
                         }
                     } elseif (is_array($field_value)) {
@@ -275,7 +312,7 @@ class Faq_Ai_Generator_Api {
                                     }
                                 }
                                 break;
-                                
+
                             case 'group':
                                 foreach ($field_value as $sub_field_name => $sub_field_value) {
                                     $sub_field_content = $extract_acf_content($sub_field_value, "{$field_name}.{$sub_field_name}");
@@ -284,7 +321,7 @@ class Faq_Ai_Generator_Api {
                                     }
                                 }
                                 break;
-                                
+
                             case 'flexible_content':
                                 foreach ($field_value as $index => $layout) {
                                     if (isset($layout['acf_fc_layout'])) {
@@ -300,7 +337,7 @@ class Faq_Ai_Generator_Api {
                                     }
                                 }
                                 break;
-                                
+
                             default:
                                 foreach ($field_value as $key => $value) {
                                     if (is_string($value)) {
@@ -308,7 +345,7 @@ class Faq_Ai_Generator_Api {
                                         if (!empty($clean_text)) {
                                             $content .= $clean_text . "\n";
                                             if (FAQ_AI_DEBUG) {
-                                                error_log("FAQ AI Generator - ACF Field '{$field_name}[{$key}]': Text content found (" . strlen($clean_text) . " chars)");
+                                                Faq_Ai_Generator_Logger::debug("ACF Field '{$field_name}[{$key}]': Text content found (" . strlen($clean_text) . " chars)");
                                             }
                                         }
                                     } elseif (is_array($value)) {
@@ -320,10 +357,10 @@ class Faq_Ai_Generator_Api {
                                 }
                         }
                     }
-                    
+
                     return $content;
                 };
-                
+
                 // Estrai il contenuto da tutti i campi ACF
                 foreach ($fields as $field_name => $field_value) {
                     // Ottieni il tipo di campo ACF
@@ -334,46 +371,36 @@ class Faq_Ai_Generator_Api {
                             $field_type = $field_object['type'];
                         }
                     }
-                    
+
                     $field_content = $extract_acf_content($field_value, $field_name, $field_type);
                     if (!empty($field_content)) {
                         $acf_content .= $field_content;
                     }
                 }
             } else {
-                if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - No ACF fields found for post ID: ' . $post_id);
-                }
+                Faq_Ai_Generator_Logger::debug('No ACF fields found for post ID: ' . $post_id);
             }
         } else {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - ACF plugin not active');
-            }
+            Faq_Ai_Generator_Logger::debug('ACF plugin not active');
         }
-        
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - ACF content length: ' . strlen($acf_content));
-        }
-        
+
+        Faq_Ai_Generator_Logger::debug('ACF content length: ' . strlen($acf_content));
+
         // Combina il contenuto HTML con i dati ACF
         if (!empty($acf_content)) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Adding ACF content to main content');
-            }
+            Faq_Ai_Generator_Logger::debug('Adding ACF content to main content');
             $content .= "\n\n" . $acf_content;
         }
-        
+
         // Pulisci il contenuto
         $content = preg_replace('/\s+/', ' ', $content);
         $content = trim($content);
-        
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Final content length: ' . strlen($content));
-            if (empty($content)) {
-                error_log('FAQ AI Generator - WARNING: Final content is empty!');
-            }
+
+        Faq_Ai_Generator_Logger::debug('Final content length: ' . strlen($content));
+        if (empty($content)) {
+            Faq_Ai_Generator_Logger::warning('WARNING: Final content is empty!');
         }
-        
+
         return $content;
     }
 
@@ -384,11 +411,12 @@ class Faq_Ai_Generator_Api {
      * @param    DOMElement    $element    Elemento DOM da convertire
      * @return   string                   Contenuto in formato Markdown
      */
-    private function html_to_markdown($element) {
+    private function html_to_markdown($element)
+    {
         $markdown = '';
-        
+
         // Funzione ricorsiva per convertire i nodi
-        $convert_node = function($node) use (&$convert_node, &$markdown) {
+        $convert_node = function ($node) use (&$convert_node, &$markdown) {
             if ($node->nodeType === XML_TEXT_NODE) {
                 $text = trim($node->textContent);
                 if (!empty($text)) {
@@ -396,10 +424,10 @@ class Faq_Ai_Generator_Api {
                 }
                 return;
             }
-            
+
             if ($node->nodeType === XML_ELEMENT_NODE) {
                 $tag = strtolower($node->nodeName);
-                
+
                 // Gestisci i tag principali
                 switch ($tag) {
                     case 'h1':
@@ -411,75 +439,75 @@ class Faq_Ai_Generator_Api {
                         $level = substr($tag, 1);
                         $markdown .= "\n\n" . str_repeat('#', $level) . ' ';
                         break;
-                        
+
                     case 'p':
                         $markdown .= "\n\n";
                         break;
-                        
+
                     case 'br':
                         $markdown .= "\n";
                         break;
-                        
+
                     case 'strong':
                     case 'b':
                         $markdown .= '**';
                         break;
-                        
+
                     case 'em':
                     case 'i':
                         $markdown .= '*';
                         break;
-                        
+
                     case 'ul':
                         $markdown .= "\n\n";
                         break;
-                        
+
                     case 'ol':
                         $markdown .= "\n\n";
                         break;
-                        
+
                     case 'li':
                         $markdown .= "\n- ";
                         break;
-                        
+
                     case 'blockquote':
                         $markdown .= "\n\n> ";
                         break;
-                        
+
                     case 'code':
                         $markdown .= '`';
                         break;
-                        
+
                     case 'pre':
                         $markdown .= "\n\n```\n";
                         break;
                 }
-                
+
                 // Processa i nodi figli
                 foreach ($node->childNodes as $child) {
                     $convert_node($child);
                 }
-                
+
                 // Chiudi i tag
                 switch ($tag) {
                     case 'strong':
                     case 'b':
                         $markdown .= '**';
                         break;
-                        
+
                     case 'em':
                     case 'i':
                         $markdown .= '*';
                         break;
-                        
+
                     case 'code':
                         $markdown .= '`';
                         break;
-                        
+
                     case 'pre':
                         $markdown .= "\n```\n";
                         break;
-                        
+
                     case 'p':
                     case 'h1':
                     case 'h2':
@@ -495,15 +523,15 @@ class Faq_Ai_Generator_Api {
                 }
             }
         };
-        
+
         // Converti l'elemento
         $convert_node($element);
-        
+
         // Pulisci il markdown
         $markdown = preg_replace('/\n{3,}/', "\n\n", $markdown);
         $markdown = preg_replace('/\s+/', ' ', $markdown);
         $markdown = trim($markdown);
-        
+
         return $markdown;
     }
 
@@ -516,38 +544,40 @@ class Faq_Ai_Generator_Api {
      * @param    array     $existing_faqs   FAQ esistenti
      * @return   string                     Il prompt completo
      */
-    private function build_prompt($content, $existing_faqs = array()) {
+    private function build_prompt($content, $existing_faqs = array())
+    {
         $locale = get_locale();
-        
+
         // 1. Inizia con il prompt base
         $prompt = $this->get_base_prompt();
-        
+
         // 2. Aggiungi eventuali istruzioni extra dalle impostazioni
         $settings = get_option('faq_ai_generator_settings');
         if (!empty($settings['extra_prompt'])) {
-            $prompt .= ($locale === 'en_US' ? "EXTRA INSTRUCTIONS:\n" : "ISTRUZIONI EXTRA:\n") . 
-                      trim($settings['extra_prompt']) . "\n\n";
+            $prompt .= ($locale === 'en_US' ? "EXTRA INSTRUCTIONS:\n" : "ISTRUZIONI EXTRA:\n") .
+                trim($settings['extra_prompt']) . "\n\n";
         }
-        
+
         // 3. Aggiungi le FAQ esistenti se presenti
         if (!empty($existing_faqs)) {
             $prompt .= ($locale === 'en_US' ? "EXISTING FAQS (generate different FAQs from these):\n" : "FAQ GIÀ ESISTENTI (genera FAQ diverse da queste):\n");
             foreach ($existing_faqs as $index => $faq) {
-                $prompt .= sprintf("%d. Q: %s\nA: %s\n\n", 
-                    $index + 1, 
+                $prompt .= sprintf(
+                    "%d. Q: %s\nA: %s\n\n",
+                    $index + 1,
                     html_entity_decode(wp_strip_all_tags($faq['question']), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
                     html_entity_decode(wp_strip_all_tags($faq['answer']), ENT_QUOTES | ENT_HTML5, 'UTF-8')
                 );
             }
         }
-        
+
         // 4. Aggiungi il contenuto dell'articolo
-        $prompt .= ($locale === 'en_US' ? "CONTENT TO ANALYZE:\n\n" : "CONTENUTO DA ANALIZZARE:\n\n") . 
-                  html_entity_decode(wp_strip_all_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        
+        $prompt .= ($locale === 'en_US' ? "CONTENT TO ANALYZE:\n\n" : "CONTENUTO DA ANALIZZARE:\n\n") .
+            html_entity_decode(wp_strip_all_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
         // 5. Assicurati che il prompt sia in UTF-8 pulito
         $prompt = mb_convert_encoding($prompt, 'UTF-8', 'UTF-8');
-        
+
         return $prompt;
     }
 
@@ -559,113 +589,121 @@ class Faq_Ai_Generator_Api {
      * @param    array     $existing_faqs  Existing FAQs to consider
      * @return   array|WP_Error           Generated FAQs or error
      */
-    public function generate_faqs($content, $existing_faqs = array()) {
+    public function generate_faqs($content, $existing_faqs = array())
+    {
         if (empty($this->api_key)) {
             return new WP_Error('no_api_key', __('API key not configured', 'faq-ai-generator'));
         }
 
         if (empty($content)) {
             if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Content is empty, attempting to get content from post');
+                Faq_Ai_Generator_Logger::debug('Content is empty, attempting to get content from post');
             }
-            
+
             // Prova diversi metodi per ottenere l'ID del post
             $post_id = null;
-            
+
             // 1. Controlla se siamo nella pagina di modifica del post
-            if (is_admin() && isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
-                $post_id = intval($_GET['post']);
+            if (is_admin() && isset($_GET['post']) && isset($_GET['action']) && sanitize_text_field(wp_unslash($_GET['action'])) === 'edit') {
+                $post_id = intval(sanitize_text_field(wp_unslash($_GET['post'])));
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - Edit page context, post ID: ' . $post_id);
-                    error_log('FAQ AI Generator - Current URL: ' . $_SERVER['REQUEST_URI']);
+                    $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+                    $context = ['url' => $request_uri];
+                    Faq_Ai_Generator_Logger::debug('Edit page context, post ID: ' . $post_id, $context);
                 }
             }
-            
+
             // 2. Controlla se siamo in un contesto AJAX
             if (!$post_id && wp_doing_ajax() && isset($_POST['post_id'])) {
-                $post_id = intval($_POST['post_id']);
-                if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - AJAX context, post ID from POST: ' . $post_id);
+                // Verifica nonce per richieste AJAX usando check_ajax_referer
+                try {
+                    check_ajax_referer('faq_ai_nonce', 'nonce');
+                    $post_id = intval(sanitize_text_field(wp_unslash($_POST['post_id'])));
+                    if (FAQ_AI_DEBUG) {
+                        Faq_Ai_Generator_Logger::debug('AJAX context, post ID from POST: ' . $post_id);
+                    }
+                } catch (Exception $e) {
+                    if (FAQ_AI_DEBUG) {
+                        Faq_Ai_Generator_Logger::warning('AJAX request without valid nonce: ' . $e->getMessage());
+                    }
                 }
             }
-            
+
             // 3. Prova get_the_ID()
             if (!$post_id) {
                 $post_id = get_the_ID();
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - get_the_ID() result: ' . ($post_id ? $post_id : 'false'));
+                    Faq_Ai_Generator_Logger::debug('get_the_ID() result: ' . ($post_id ? $post_id : 'false'));
                 }
             }
-            
+
             // 4. Se non funziona, prova a ottenere l'ID dalla query globale
             if (!$post_id && isset($GLOBALS['wp_query']->post)) {
                 $post_id = $GLOBALS['wp_query']->post->ID;
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - Global query post ID: ' . ($post_id ? $post_id : 'false'));
+                    Faq_Ai_Generator_Logger::debug('Global query post ID: ' . ($post_id ? $post_id : 'false'));
                 }
             }
-            
+
             if ($post_id) {
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - Post ID found: ' . $post_id);
-                    error_log('FAQ AI Generator - Post type: ' . get_post_type($post_id));
-                    error_log('FAQ AI Generator - Current context: ' . (wp_doing_ajax() ? 'AJAX' : (is_admin() ? 'Admin' : 'Frontend')));
+                    $context = [
+                        'post_type' => get_post_type($post_id),
+                        'context' => wp_doing_ajax() ? 'AJAX' : (is_admin() ? 'Admin' : 'Frontend')
+                    ];
+                    Faq_Ai_Generator_Logger::debug('Post ID found: ' . $post_id, $context);
                 }
-                
+
                 // Verifica che il post esista e sia del tipo corretto
                 $post = get_post($post_id);
                 if (!$post) {
                     if (FAQ_AI_DEBUG) {
-                        error_log('FAQ AI Generator - Post not found: ' . $post_id);
+                        Faq_Ai_Generator_Logger::warning('Post not found: ' . $post_id);
                     }
                     return new WP_Error('invalid_post', __('Invalid post ID. The post does not exist.', 'faq-ai-generator'));
                 }
-                
+
                 // Verifica che il post sia pubblicato o in bozza
                 if ($post->post_status !== 'publish' && $post->post_status !== 'draft') {
                     if (FAQ_AI_DEBUG) {
-                        error_log('FAQ AI Generator - Post status not valid: ' . $post->post_status);
+                        Faq_Ai_Generator_Logger::warning('Post status not valid: ' . $post->post_status);
                     }
                     return new WP_Error('invalid_status', __('The post must be published or in draft status.', 'faq-ai-generator'));
                 }
-                
+
                 $content = $this->get_page_content_via_curl($post_id);
                 if (empty($content)) {
                     if (FAQ_AI_DEBUG) {
-                        error_log('FAQ AI Generator - No content retrieved from post');
+                        Faq_Ai_Generator_Logger::error('No content retrieved from post');
                     }
                     return new WP_Error('no_content', __('No content found to generate FAQs', 'faq-ai-generator'));
                 }
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - Content retrieved from post, length: ' . strlen($content));
+                    Faq_Ai_Generator_Logger::debug('Content retrieved from post, length: ' . strlen($content));
                 }
             } else {
                 if (FAQ_AI_DEBUG) {
-                    error_log('FAQ AI Generator - No post ID found in any context');
-                    error_log('FAQ AI Generator - Current context: ' . (wp_doing_ajax() ? 'AJAX' : (is_admin() ? 'Admin' : 'Frontend')));
+                    $context = ['context' => wp_doing_ajax() ? 'AJAX' : (is_admin() ? 'Admin' : 'Frontend')];
+                    Faq_Ai_Generator_Logger::warning('No post ID found in any context', $context);
                 }
                 return new WP_Error('no_post', __('No post ID found. Please make sure you are on a post or page, or provide a valid post ID.', 'faq-ai-generator'));
             }
         } else {
             if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Using provided content, length: ' . strlen($content));
+                Faq_Ai_Generator_Logger::debug('Using provided content, length: ' . strlen($content));
             }
         }
-
-        // Recupera le impostazioni
-        $settings = get_option('faq_ai_generator_settings');
-        $model = !empty($settings['model']) ? $settings['model'] : 'gpt-3.5-turbo';
 
         // Genera il prompt completo
         $prompt = $this->build_prompt($content, $existing_faqs);
         if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Built prompt, length: ' . strlen($prompt));
-            error_log('FAQ AI Generator - Prompt content: ' . substr($prompt, 0, 500) . '...');
+            Faq_Ai_Generator_Logger::debug('Built prompt, length: ' . strlen($prompt));
+            Faq_Ai_Generator_Logger::debug('Prompt content: ' . substr($prompt, 0, 500) . '...');
         }
 
         // Prepara i dati per la chiamata API
         $request_data = array(
-            'model' => $model,
+            'model' => $this->model_id,
             'messages' => array(
                 array(
                     'role' => 'system',
@@ -682,11 +720,11 @@ class Faq_Ai_Generator_Api {
 
         // Modifica dei log per usare la costante di debug
         if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Request Parameters:');
-            error_log('Model: ' . $model);
-            error_log('Prompt Length: ' . strlen($prompt));
-            error_log('Existing FAQs Count: ' . count($existing_faqs));
-            error_log('Request Data: ' . json_encode($request_data, JSON_PRETTY_PRINT));
+            Faq_Ai_Generator_Logger::debug('Request Parameters:');
+            Faq_Ai_Generator_Logger::debug('Model: ' . $this->model_id);
+            Faq_Ai_Generator_Logger::debug('Prompt Length: ' . strlen($prompt));
+            Faq_Ai_Generator_Logger::debug('Existing FAQs Count: ' . count($existing_faqs));
+            Faq_Ai_Generator_Logger::debug('Request Data: ' . json_encode($request_data, JSON_PRETTY_PRINT));
         }
 
         // Chiamata API
@@ -704,79 +742,92 @@ class Faq_Ai_Generator_Api {
 
         // Log del tempo di esecuzione solo in debug
         if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - API Call Execution Time: ' . $execution_time . 'ms');
+            Faq_Ai_Generator_Logger::debug('API Call Execution Time: ' . $execution_time . 'ms');
         }
 
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
             if (strpos($error_message, 'Operation timed out') !== false) {
-                return new WP_Error('timeout', __('La richiesta ha impiegato troppo tempo. Per favore riprova più tardi.', 'faq-ai-generator'));
+                return new WP_Error('timeout', __('The request took too long. Please try again later.', 'faq-ai-generator'));
             }
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - API Error: ' . $error_message);
-                error_log('FAQ AI Generator - Error Code: ' . $response->get_error_code());
-            }
+            $context = [
+                'error_message' => $error_message,
+                'error_code' => $response->get_error_code(),
+                'response' => $response
+            ];
+            Faq_Ai_Generator_Logger::error('API Error: ' . $error_message, $context);
             return $response;
         }
 
         // Log della risposta solo in debug
         $response_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
-        
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Response Body: ' . $response_body);
+        if ($response_code !== 200) {
+            $context = [
+                'response_code' => $response_code,
+                'response_body' => $response_body
+            ];
+            Faq_Ai_Generator_Logger::error('API Error: ' . $response_code, $context);
+            /* translators: %1$s: Response code, %2$s: Response body */
+            return new WP_Error('api_error', sprintf(__('API error: %1$s - %2$s', 'faq-ai-generator'), $response_code, $response_body));
         }
+
+        $context = [
+            'response_code' => $response_code,
+            'response_body' => $response_body
+        ];
+        Faq_Ai_Generator_Logger::debug('Response Body: ' . $response_body, $context);
 
         $body = json_decode($response_body, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - JSON Error: ' . json_last_error_msg());
-                error_log('FAQ AI Generator - Failed to parse content as JSON: ' . $response_body);
-            }
+            $context = [
+                'json_error' => json_last_error_msg(),
+                'response_body' => $response_body
+            ];
+            Faq_Ai_Generator_Logger::error('JSON Error: ' . json_last_error_msg(), $context);
             /* translators: %s: JSON error message */
             return new WP_Error('json_error', sprintf(__('Error decoding API response: %s', 'faq-ai-generator'), json_last_error_msg()));
         }
 
         if (!isset($body['choices'][0]['message']['content'])) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - Invalid Response Structure: ' . print_r($body, true));
-            }
+            $context = [
+                'body' => $body
+            ];
+            Faq_Ai_Generator_Logger::error('Invalid Response Structure', $context);
             return new WP_Error('invalid_response', __('Invalid API response structure', 'faq-ai-generator'));
         }
 
         $content = $body['choices'][0]['message']['content'];
-        
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Raw Content: ' . $content);
-        }
-        
+
+        $context = [
+            'content' => $content
+        ];
+        Faq_Ai_Generator_Logger::debug('Raw Content', $context);
+
         // Rimuovi eventuali caratteri di escape e newline
         $content = str_replace(['\n', '\r'], '', $content);
-        
+
         // Pulisci la risposta rimuovendo i backtick e il tag json
         $content = preg_replace('/^```json\s*|\s*```$/', '', $content);
         $content = trim($content);
-        
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Cleaned Content: ' . $content);
-        }
-        
+
+        Faq_Ai_Generator_Logger::debug('Cleaned Content: ' . $content);
+
         // Prova a decodificare come JSON
         $faqs = json_decode($content, true);
-        
+
         if (json_last_error() !== JSON_ERROR_NONE) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - JSON Error: ' . json_last_error_msg());
-                error_log('FAQ AI Generator - Failed to parse content as JSON: ' . $content);
-            }
+            $context = [
+                'json_error' => json_last_error_msg(),
+                'content' => $content
+            ];
+            Faq_Ai_Generator_Logger::error('JSON Error: ' . json_last_error_msg(), $context);
             /* translators: %s: JSON error message */
             return new WP_Error('json_error', sprintf(__('Error decoding FAQ JSON: %s', 'faq-ai-generator'), json_last_error_msg()));
         }
 
         if (!is_array($faqs) || empty($faqs)) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - No valid FAQs found in response');
-            }
+            Faq_Ai_Generator_Logger::error('No valid FAQs found in response');
             return new WP_Error('no_faqs', __('No valid FAQs found in response', 'faq-ai-generator'));
         }
 
@@ -790,7 +841,8 @@ class Faq_Ai_Generator_Api {
      * @param    string    $content    The post content
      * @return   string               The formatted prompt
      */
-    private function get_prompt($content) {
+    private function get_prompt($content)
+    {
         return sprintf(
             "Genera 5-7 FAQ pertinenti per il seguente contenuto. Formatta ogni FAQ come 'Q: domanda\nA: risposta'. Il contenuto è:\n\n%s",
             $content
@@ -804,46 +856,45 @@ class Faq_Ai_Generator_Api {
      * @param    array    $response    The API response
      * @return   array                Formatted FAQ items
      */
-    private function parse_response($response) {
+    private function parse_response($response)
+    {
         if (empty($response['choices'][0]['message']['content'])) {
             return new WP_Error('invalid_response', __('Invalid API response', 'faq-ai-generator'));
         }
 
         $content = $response['choices'][0]['message']['content'];
-        
+
         // Log del contenuto per debug
-        if (FAQ_AI_DEBUG) {
-            error_log('FAQ AI Generator - Raw Content: ' . $content);
-        }
-        
+        Faq_Ai_Generator_Logger::debug('Raw Content: ' . $content);
+
         // Rimuovi eventuali caratteri di escape e newline
         $content = str_replace(['\n', '\r'], '', $content);
-        
+
         // Prova a decodificare come JSON
         $decoded = json_decode($content, true);
-        
+
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             // Verifica che ogni elemento abbia question e answer
-            $valid_faqs = array_filter($decoded, function($faq) {
-                return isset($faq['question']) && isset($faq['answer']) && 
-                       !empty($faq['question']) && !empty($faq['answer']);
+            $valid_faqs = array_filter($decoded, function ($faq) {
+                return isset($faq['question']) && isset($faq['answer']) &&
+                    !empty($faq['question']) && !empty($faq['answer']);
             });
-            
+
             if (!empty($valid_faqs)) {
                 return array_values($valid_faqs);
             }
         }
-        
+
         // Se non è JSON valido o non contiene FAQ valide, prova a estrarre FAQ dal testo
         $faqs = array();
         $lines = explode("\n", $content);
-        
+
         $current_question = '';
         $current_answer = '';
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             // Se la riga inizia con "Q:" o "Domanda:", è una nuova domanda
             if (preg_match('/^(Q:|Domanda:|Q\.|Domanda\.)\s*(.+)$/i', $line, $matches)) {
                 // Se abbiamo una domanda e risposta precedenti, salvale
@@ -865,7 +916,7 @@ class Faq_Ai_Generator_Api {
                 $current_answer .= "\n" . $line;
             }
         }
-        
+
         // Aggiungi l'ultima FAQ se presente
         if (!empty($current_question) && !empty($current_answer)) {
             $faqs[] = array(
@@ -875,13 +926,14 @@ class Faq_Ai_Generator_Api {
         }
 
         if (empty($faqs)) {
-            if (FAQ_AI_DEBUG) {
-                error_log('FAQ AI Generator - No valid FAQs found in response');
-                error_log('FAQ AI Generator - JSON Error: ' . json_last_error_msg());
-            }
+            $context = [
+                'json_error' => json_last_error_msg(),
+                'content' => $content
+            ];
+            Faq_Ai_Generator_Logger::error('No valid FAQs found in response', $context);
             return new WP_Error('no_faqs', __('No FAQs found in the response', 'faq-ai-generator'));
         }
 
         return $faqs;
     }
-} 
+}

@@ -10,8 +10,11 @@
  * @wordpress-plugin
  * Plugin Name:       FAQ AI Generator
  * Plugin URI:        https://github.com/netingweb/faq-ai-generator-plugin
- * Description:       Genera automaticamente FAQ per i tuoi contenuti WordPress utilizzando l'intelligenza artificiale.
- * Version:           1.1.3
+ * Description:       Automatically generate FAQs for your WordPress content using artificial intelligence.
+ * Version:           1.1.4
+ * Requires at least: 5.0
+ * Tested up to:      6.4
+ * Requires PHP:      7.4
  * Author:            netingweb
  * Author URI:        https://profiles.wordpress.org/netingweb/
  * License:           GPL-2.0+
@@ -21,8 +24,28 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (!defined('WPINC')) {
 	die;
+}
+
+// Check WordPress version
+if (version_compare(get_bloginfo('version'), '5.0', '<')) {
+	add_action('admin_notices', function () {
+		echo '<div class="notice notice-error"><p>';
+		echo '<strong>FAQ AI Generator</strong> requires WordPress 5.0 or higher. Please upgrade WordPress to use this plugin.';
+		echo '</p></div>';
+	});
+	return;
+}
+
+// Check PHP version
+if (version_compare(PHP_VERSION, '7.4', '<')) {
+	add_action('admin_notices', function () {
+		echo '<div class="notice notice-error"><p>';
+		echo '<strong>FAQ AI Generator</strong> requires PHP 7.4 or higher. Please upgrade PHP to use this plugin.';
+		echo '</p></div>';
+	});
+	return;
 }
 
 /**
@@ -30,14 +53,15 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'FAQ_AI_GENERATOR_VERSION', '1.1.2' );
+define('FAQ_AI_GENERATOR_VERSION', '1.1.4');
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-faq-ai-generator-activator.php
  */
-function activate_faq_ai_generator() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-faq-ai-generator-activator.php';
+function activate_faq_ai_generator()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator-activator.php';
 	Faq_Ai_Generator_Activator::activate();
 }
 
@@ -45,19 +69,20 @@ function activate_faq_ai_generator() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-faq-ai-generator-deactivator.php
  */
-function deactivate_faq_ai_generator() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-faq-ai-generator-deactivator.php';
+function deactivate_faq_ai_generator()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator-deactivator.php';
 	Faq_Ai_Generator_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_faq_ai_generator' );
-register_deactivation_hook( __FILE__, 'deactivate_faq_ai_generator' );
+register_activation_hook(__FILE__, 'activate_faq_ai_generator');
+register_deactivation_hook(__FILE__, 'deactivate_faq_ai_generator');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-faq-ai-generator.php';
+require plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator.php';
 
 /**
  * Begins execution of the plugin.
@@ -68,7 +93,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-faq-ai-generator.php';
  *
  * @since    1.0.0
  */
-function run_faq_ai_generator() {
+function run_faq_ai_generator()
+{
 
 	$plugin = new Faq_Ai_Generator();
 	$plugin->run();

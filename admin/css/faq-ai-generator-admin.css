@@ -4,38 +4,132 @@
  */
 
 #faq-ai-confirm-dialog {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 100000;
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 100000;
 }
 
 .faq-ai-confirm-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    min-width: 400px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: white;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	min-width: 400px;
 }
 
 .faq-ai-confirm-content h3 {
-    margin-top: 0;
-    color: #23282d;
+	margin-top: 0;
+	color: #23282d;
 }
 
 .faq-ai-confirm-buttons {
-    margin-top: 20px;
-    text-align: right;
+	margin-top: 20px;
+	text-align: right;
 }
 
 .faq-ai-confirm-buttons button {
-    margin-left: 10px;
+	margin-left: 10px;
+}
+
+.faq-ai-generator-metabox {
+	padding: 10px;
+}
+
+.faq-ai-generator-controls {
+	margin-bottom: 15px;
+}
+
+.faq-ai-generator-display-option {
+	margin-bottom: 15px;
+}
+
+.faq-ai-generator-add {
+	margin-top: 15px;
+}
+
+.faq-item {
+	margin-bottom: 15px;
+	padding: 10px;
+	border: 1px solid #ddd;
+	background: #fff;
+}
+
+.faq-question input,
+.faq-answer textarea {
+	width: 100%;
+	margin-bottom: 5px;
+}
+
+.faq-answer textarea {
+	height: 100px;
+}
+
+.faq-remove {
+	margin-top: 5px;
+}
+
+#faq-ai-confirm-dialog {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 999999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.faq-ai-confirm-content {
+	background: #fff;
+	padding: 20px;
+	border-radius: 5px;
+	max-width: 500px;
+	width: 90%;
+}
+
+.faq-ai-confirm-buttons {
+	margin-top: 20px;
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.api-status {
+	display: inline-block;
+	margin-left: 10px;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-weight: bold;
+}
+
+.api-status.valid {
+	color: #46b450;
+	background: #f0f6f0;
+}
+
+.api-status.invalid {
+	color: #dc3232;
+	background: #fbeaea;
+}
+
+.readonly-checkbox {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.readonly-checkbox + .description {
+	color: #666;
+	font-style: italic;
+	margin-left: 5px;
 }

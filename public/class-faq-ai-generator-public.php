@@ -20,7 +20,8 @@
  * @subpackage Faq_Ai_Generator/public
  * @author     Luca Mainieri <info@neting.it>
  */
-class Faq_Ai_Generator_Public {
+class Faq_Ai_Generator_Public
+{
 
 	/**
 	 * The ID of this plugin.
@@ -47,7 +48,8 @@ class Faq_Ai_Generator_Public {
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -62,7 +64,8 @@ class Faq_Ai_Generator_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -76,7 +79,8 @@ class Faq_Ai_Generator_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/faq-ai-generator-public.css', array(), $this->version, 'all' );
+		wp_register_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/faq-ai-generator-public.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name);
 
 	}
 
@@ -85,7 +89,8 @@ class Faq_Ai_Generator_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -99,7 +104,17 @@ class Faq_Ai_Generator_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/faq-ai-generator-public.js', array( 'jquery' ), $this->version, false );
+		global $wp_version;
+
+		if (version_compare($wp_version, '6.3', '>=')) {
+			// WP >= 6.3: usa il parametro args con strategia 'defer'
+			wp_register_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/faq-ai-generator-public.js', array('jquery'), $this->version, array('in_footer' => true, 'strategy' => 'defer'));
+		} else {
+			// WP < 6.3: usa il parametro in_footer tradizionale
+			wp_register_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/faq-ai-generator-public.js', array('jquery'), $this->version, false);
+		}
+
+		wp_enqueue_script($this->plugin_name);
 
 	}
 
@@ -110,7 +125,8 @@ class Faq_Ai_Generator_Public {
 	 * @param    string    $content    Il contenuto del post
 	 * @return   string               Il contenuto modificato
 	 */
-	public function display_faqs_in_content($content) {
+	public function display_faqs_in_content($content)
+	{
 		// Verifica se siamo in una pagina singola
 		if (!is_singular()) {
 			return $content;
@@ -124,9 +140,9 @@ class Faq_Ai_Generator_Public {
 		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
 
 		// Verifica se il post type è abilitato
-		$is_enabled = $current_post_type === 'post' || 
-					 $current_post_type === 'page' || 
-					 (isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
+		$is_enabled = $current_post_type === 'post' ||
+			$current_post_type === 'page' ||
+			(isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
 
 		if (!$is_enabled) {
 			return $content;
@@ -158,87 +174,31 @@ class Faq_Ai_Generator_Public {
 
 		$faq_html .= '</div></div>';
 
-		// Aggiungi stili CSS inline per le FAQ
-		$faq_html .= '
-		<style>
-		.faq-ai-generator-container {
-			margin: 2em 0;
-			padding: 1em;
-			border: 1px solid #ddd;
-			border-radius: 4px;
-		}
-		.faq-ai-generator-container h2 {
-			margin-bottom: 1em;
-		}
-		.faq-item {
-			margin-bottom: 1em;
-		}
-		.faq-question {
-			font-weight: bold;
-			margin-bottom: 0.5em;
-			color: #333;
-			cursor: pointer;
-			position: relative;
-			padding-right: 20px;
-		}
-		.faq-question:after {
-			content: "+";
-			position: absolute;
-			right: 0;
-			top: 50%;
-			transform: translateY(-50%);
-		}
-		.faq-question.active:after {
-			content: "-";
-		}
-		.faq-answer {
-			
-			color: #666;
-			display: none;
-		}
-		.faq-answer.active {
-			display: block;
-		}
-		</style>';
-
-		// Aggiungi JavaScript per il toggle delle FAQ
-		$faq_html .= '
-		<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			document.querySelectorAll(".faq-question").forEach(function(question) {
-				question.addEventListener("click", function() {
-					this.classList.toggle("active");
-					var answer = this.nextElementSibling;
-					answer.classList.toggle("active");
-				});
-			});
-		});
-		</script>';
-
 		return $content . $faq_html;
 	}
 
 	/**
-	 * Aggiunge lo schema.org delle FAQ
+	 * Add the schema.org for the FAQ
 	 *
 	 * @since    1.0.0
 	 */
-	public function add_faq_schema() {
+	public function add_faq_schema()
+	{
 		if (!is_singular()) {
 			return;
 		}
 
-		// Recupera il post type corrente
+		// Get the current post type
 		$current_post_type = get_post_type();
 
-		// Recupera le impostazioni
+		// Get the settings
 		$settings = get_option('faq_ai_generator_settings', array());
 		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
 
-		// Verifica se il post type è abilitato
-		$is_enabled = $current_post_type === 'post' || 
-					 $current_post_type === 'page' || 
-					 (isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
+		// Check if the post type is enabled
+		$is_enabled = $current_post_type === 'post' ||
+			$current_post_type === 'page' ||
+			(isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
 
 		if (!$is_enabled) {
 			return;
@@ -268,9 +228,11 @@ class Faq_Ai_Generator_Public {
 			);
 		}
 
-		// Stampa lo schema JSON-LD con i tag script
+
+
+		// Print the JSON-LD schema directly
 		echo "\n<!-- FAQ AI Generator Schema -->\n";
-		echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+		echo '<script type="application/ld+json" id="faq-ai-schema">' . wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
 	}
 
 }

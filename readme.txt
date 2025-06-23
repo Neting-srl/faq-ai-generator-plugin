@@ -1,9 +1,9 @@
 === FAQ AI Generator ===
 Contributors: netingweb
-Tags: faq, ai, openai, gpt-4, schema.org, acf
+Tags: faq, ai, openai, schema.org, acf
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,24 @@ Yes, you can modify, add, or remove FAQs directly from the plugin's admin interf
 3. Plugin settings
 4. FAQ display in frontend
 
+== External services ==
+
+This plugin connects to the OpenAI API (https://api.openai.com) to generate FAQ content using artificial intelligence.
+
+= What data is sent and when =
+
+The plugin sends the following data to OpenAI's servers:
+* Your page/post content (including ACF fields if applicable) when you click the "Generate FAQs" button
+* This data is only sent when you explicitly request FAQ generation from the admin interface
+* No user data from your website visitors is ever collected or transmitted
+
+The data is processed by OpenAI's models to generate relevant questions and answers based on your content.
+
+= Terms and Privacy =
+
+* OpenAI Terms of Service: https://openai.com/policies/terms-of-use
+* OpenAI Privacy Policy: https://openai.com/policies/privacy-policy
+
 == Changelog ==
 
 = 1.1.3 =
@@ -113,6 +131,8 @@ Important update with full ACF support and significant improvements in content h
 == Privacy Policy ==
 
 FAQ AI Generator does not collect any personal data. The plugin uses the OpenAI API to generate FAQs but does not store or share data with third parties.
+
+
 
 == Credits ==
 

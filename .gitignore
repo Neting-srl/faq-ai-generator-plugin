@@ -1,55 +1,58 @@
-# File di sistema
+# System files
 .DS_Store
 Thumbs.db
 *.swp
 *.swo
 
-# File di ambiente
+# Environment files
 .env
 .env.local
 .env.*.local
 
-# File di IDE
+# IDE files
 .idea/
 .vscode/
 *.sublime-project
 *.sublime-workspace
 
-# File di dipendenze
+# Dependencies
 /vendor/
 /node_modules/
 composer.lock
 package-lock.json
 yarn.lock
 
-# File di build e distribuzione
+# Build and distribution
 /dist/
 /build/
 *.zip
 
-# File di log
+# Log files
 *.log
 logs/
 
-# File di configurazione locale
+# Local configuration
 wp-config.php
 wp-config-local.php
 
-# File temporanei
+# Temporary files
 *.tmp
 *.temp
 *.bak
 
-# File di debug
+# Debug files
 debug.log
 debug.txt
 
-# File di cache
+# Cache files
 *.cache
 .cache/
 wp-content/cache/
 
-# File di backup
+# Backup files
 *.backup
 *.bak
-*.old 
+*.old
+
+# Plugin zip files
+*.zip
