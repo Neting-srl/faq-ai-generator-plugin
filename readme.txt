@@ -3,7 +3,7 @@ Contributors: netingweb
 Tags: faq, ai, openai, schema.org, acf
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,16 @@ The data is processed by OpenAI's models to generate relevant questions and answ
 * OpenAI Privacy Policy: https://openai.com/policies/privacy-policy
 
 == Changelog ==
+
+= 1.1.5 =
+* Fixed FAQ generation AJAX and unified metabox JavaScript
+* Added optional per-post generation hint
+* Updated OpenAI model list with sync and custom model ID
+* Conditional front-end/admin asset loading
+
+= 1.1.4 =
+* Added newer OpenAI models
+* Improved error and log management
 
 = 1.1.3 =
 * Updated plugin GitHub repository

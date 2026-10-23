@@ -1,0 +1,43 @@
+---
+description: Sicurezza WordPress per FAQ AI Generator — ABSPATH, sanitize, escape, nonce, capability, segreti API
+globs: "**/*.php"
+alwaysApply: true
+---
+
+# Sicurezza — FAQ AI Generator
+
+Riferimento: [WordPress Security APIs](https://developer.wordpress.org/apis/security/).
+
+## Obbligatorio su ogni file PHP
+
+1. Guard in testa: `defined( 'ABSPATH' ) || exit;` oppure `if ( ! defined( 'WPINC' ) ) { die; }` (coerente col file esistente).
+2. Mai fidarsi di `$_GET` / `$_POST` / `$_REQUEST` / input AJAX senza sanitize.
+
+## Input
+
+- Sempre `wp_unslash()` + `sanitize_*` (`sanitize_text_field`, `sanitize_textarea_field`, `sanitize_key`, `absint`, `esc_url_raw`).
+- Liste chiuse con `in_array( $v, $allowed, true )` quando i valori sono noti (es. provider).
+- FAQ da form: domande con `sanitize_text_field`, risposte con `wp_kses_post`.
+
+## Output
+
+- `esc_html()` / `esc_html__()` testo · `esc_attr()` attributi · `esc_url()` URL · `wp_kses_post()` HTML consentito.
+- Mai echo di variabili non escapate. Dati verso JS solo con `wp_localize_script()` (niente JSON inline non controllato).
+
+## Nonce e capability
+
+- Form admin: `wp_nonce_field` / `wp_verify_nonce` (action `faq_ai_nonce` o prefisso `faq_ai_`).
+- AJAX: `check_ajax_referer( 'faq_ai_nonce', 'nonce' )` **prima** della logica.
+- Poi capability contestuale: `edit_post` sul post, `manage_options` per settings/sync modelli.
+- Vietato rimuovere o allentare check esistenti; aggiungerne è sempre permesso.
+
+## Segreti e OpenAI
+
+- API key solo in option settings, mai in repo, commit, log, HTML pubblico, `readme`.
+- Con `debug_mode` attivo: non loggare la chiave né il body completo se contiene dati personali; mascherare dove possibile.
+- Timeout HTTP espliciti sulle remote request; gestire `WP_Error`.
+
+## Meta e AJAX
+
+- Prima di leggere/scrivere `_faq_ai_data`: verificare che l’utente possa modificare quel post.
+- Risposte AJAX: `wp_send_json_success` / `wp_send_json_error` con messaggi già escapati o plain text sanitizzati.

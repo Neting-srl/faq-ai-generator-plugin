@@ -1,32 +1,69 @@
-(function( $ ) {
-	'use strict';
+(($) => {
+	$(() => {
+		const config = window.faqAiGeneratorSettings || {};
+		const $button = $("#faq-ai-sync-models");
+		const $select = $("#model");
+		const $status = $("#faq-ai-sync-status");
 
-	/**
-	 * All of the code for your admin-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+		if (!$button.length) {
+			return;
+		}
 
-})( jQuery );
+		$button.on("click", (e) => {
+			e.preventDefault();
+
+			const originalLabel = config.i18n?.syncButton || $button.text();
+
+			$button.prop("disabled", true).text(config.i18n?.syncing || "Syncing...");
+			$status.removeClass("notice-success notice-error").text("");
+
+			$.ajax({
+				url: config.ajaxurl,
+				type: "POST",
+				data: {
+					action: "faq_ai_sync_models",
+					nonce: config.nonce,
+				},
+				success: (response) => {
+					if (!response || !response.success) {
+						const errorMessage =
+							response?.data?.message ||
+							config.i18n?.syncError ||
+							"Unable to sync models from OpenAI.";
+						$status.addClass("notice-error").text(errorMessage);
+						return;
+					}
+
+					const current = $select.val();
+					$select.empty();
+
+					$.each(response.data.models || {}, (id, name) => {
+						$select.append($("<option></option>").attr("value", id).text(name));
+					});
+
+					if (current && $select.find(`option[value="${current}"]`).length) {
+						$select.val(current);
+					}
+
+					$status
+						.addClass("notice-success")
+						.text(
+							response.data.message ||
+								config.i18n?.syncSuccess ||
+								"Models synced successfully.",
+						);
+				},
+				error: () => {
+					$status
+						.addClass("notice-error")
+						.text(
+							config.i18n?.syncError || "Unable to sync models from OpenAI.",
+						);
+				},
+				complete: () => {
+					$button.prop("disabled", false).text(originalLabel);
+				},
+			});
+		});
+	});
+})(jQuery);

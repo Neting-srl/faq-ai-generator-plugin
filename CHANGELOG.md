@@ -5,6 +5,24 @@ Tutte le modifiche notevoli a questo progetto saranno documentate in questo file
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2026-10-23
+
+### Added
+
+- Per-post generation hint in the metabox
+- OpenAI model sync from API and custom model ID field
+- Cursor agent rules/skills (`AGENTS.md`, `.cursor/`)
+
+### Fixed
+
+- Broken FAQ generation AJAX action and duplicate metabox scripts
+- Public/admin assets loading on every page
+
+### Improved
+
+- Conditional asset enqueue and footer scripts
+- Prompt composition: global extra prompt + generation hint
+
 ## [1.1.4] - 2025-06-20
 
 ### Aggiunto

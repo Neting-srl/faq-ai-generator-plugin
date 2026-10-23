@@ -150,6 +150,7 @@ class Faq_Ai_Generator
 		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
 		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'add_faq_meta_box');
 		$this->loader->add_action('wp_ajax_faq_ai_generate', $plugin_admin, 'ajax_generate_faqs');
+		$this->loader->add_action('wp_ajax_faq_ai_sync_models', $plugin_admin, 'ajax_sync_models');
 		$this->loader->add_action('save_post', $plugin_admin, 'save_faq_data');
 
 	}

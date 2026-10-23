@@ -20,8 +20,7 @@
  * @subpackage Faq_Ai_Generator/public
  * @author     Luca Mainieri <info@neting.it>
  */
-class Faq_Ai_Generator_Public
-{
+class Faq_Ai_Generator_Public {
 
 	/**
 	 * The ID of this plugin.
@@ -48,15 +47,43 @@ class Faq_Ai_Generator_Public
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version)
-	{
+	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-		// Aggiungi l'hook per visualizzare le FAQ nel contenuto
-		add_filter('the_content', array($this, 'display_faqs_in_content'));
+	}
 
+	/**
+	 * Whether the current singular request should load FAQ front-end assets.
+	 *
+	 * @since    1.1.3
+	 * @return   bool
+	 */
+	private function should_load_assets() {
+		if (!is_singular()) {
+			return false;
+		}
+
+		$post_id = get_the_ID();
+		if (!$post_id) {
+			return false;
+		}
+
+		$current_post_type = get_post_type($post_id);
+		$settings = get_option('faq_ai_generator_settings', array());
+		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
+
+		$is_enabled = $current_post_type === 'post' ||
+			$current_post_type === 'page' ||
+			(isset($enabled_post_types[ $current_post_type ]) && $enabled_post_types[ $current_post_type ]);
+
+		if (!$is_enabled) {
+			return false;
+		}
+
+		$faq_data = get_post_meta($post_id, '_faq_ai_data', true);
+		return !empty($faq_data['faqs']) && !empty($faq_data['display_in_content']);
 	}
 
 	/**
@@ -64,24 +91,18 @@ class Faq_Ai_Generator_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles()
-	{
+	public function enqueue_styles() {
+		if (!$this->should_load_assets()) {
+			return;
+		}
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Faq_Ai_Generator_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Faq_Ai_Generator_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_register_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/faq-ai-generator-public.css', array(), $this->version, 'all');
-		wp_enqueue_style($this->plugin_name);
-
+		wp_enqueue_style(
+			$this->plugin_name,
+			plugin_dir_url(__FILE__) . 'css/faq-ai-generator-public.css',
+			array(),
+			$this->version,
+			'all'
+		);
 	}
 
 	/**
@@ -89,33 +110,18 @@ class Faq_Ai_Generator_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts()
-	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Faq_Ai_Generator_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Faq_Ai_Generator_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		global $wp_version;
-
-		if (version_compare($wp_version, '6.3', '>=')) {
-			// WP >= 6.3: usa il parametro args con strategia 'defer'
-			wp_register_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/faq-ai-generator-public.js', array('jquery'), $this->version, array('in_footer' => true, 'strategy' => 'defer'));
-		} else {
-			// WP < 6.3: usa il parametro in_footer tradizionale
-			wp_register_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/faq-ai-generator-public.js', array('jquery'), $this->version, false);
+	public function enqueue_scripts() {
+		if (!$this->should_load_assets()) {
+			return;
 		}
 
-		wp_enqueue_script($this->plugin_name);
-
+		wp_enqueue_script(
+			$this->plugin_name,
+			plugin_dir_url(__FILE__) . 'js/faq-ai-generator-public.js',
+			array('jquery'),
+			$this->version,
+			true
+		);
 	}
 
 	/**
@@ -125,8 +131,7 @@ class Faq_Ai_Generator_Public
 	 * @param    string    $content    Il contenuto del post
 	 * @return   string               Il contenuto modificato
 	 */
-	public function display_faqs_in_content($content)
-	{
+	public function display_faqs_in_content($content) {
 		// Verifica se siamo in una pagina singola
 		if (!is_singular()) {
 			return $content;
@@ -140,9 +145,9 @@ class Faq_Ai_Generator_Public
 		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
 
 		// Verifica se il post type è abilitato
-		$is_enabled = $current_post_type === 'post' ||
-			$current_post_type === 'page' ||
-			(isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
+		$is_enabled = $current_post_type === 'post' || 
+					 $current_post_type === 'page' || 
+					 (isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
 
 		if (!$is_enabled) {
 			return $content;
@@ -157,15 +162,15 @@ class Faq_Ai_Generator_Public
 		}
 
 		// Genera l'HTML delle FAQ
-		$faq_html = '<div class="faq-ai-generator-container">';
+		$faq_html = '<div class="faq-ai-container">';
 		$faq_html .= '<h2>' . __('Frequently Asked Questions', 'faq-ai-generator') . '</h2>';
-		$faq_html .= '<div class="faq-ai-generator-list">';
+		$faq_html .= '<div class="faq-ai-list">';
 
 		foreach ($faq_data['faqs'] as $faq) {
 			$faq_html .= sprintf(
-				'<div class="faq-item">
-					<div class="faq-question">%s</div>
-					<div class="faq-answer">%s</div>
+				'<div class="faq-ai-item">
+					<div class="faq-ai-question">%s</div>
+					<div class="faq-ai-answer">%s</div>
 				</div>',
 				esc_html($faq['question']),
 				wpautop(wp_kses_post($faq['answer']))
@@ -178,27 +183,26 @@ class Faq_Ai_Generator_Public
 	}
 
 	/**
-	 * Add the schema.org for the FAQ
+	 * Aggiunge lo schema.org delle FAQ
 	 *
 	 * @since    1.0.0
 	 */
-	public function add_faq_schema()
-	{
+	public function add_faq_schema() {
 		if (!is_singular()) {
 			return;
 		}
 
-		// Get the current post type
+		// Recupera il post type corrente
 		$current_post_type = get_post_type();
 
-		// Get the settings
+		// Recupera le impostazioni
 		$settings = get_option('faq_ai_generator_settings', array());
 		$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
 
-		// Check if the post type is enabled
-		$is_enabled = $current_post_type === 'post' ||
-			$current_post_type === 'page' ||
-			(isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
+		// Verifica se il post type è abilitato
+		$is_enabled = $current_post_type === 'post' || 
+					 $current_post_type === 'page' || 
+					 (isset($enabled_post_types[$current_post_type]) && $enabled_post_types[$current_post_type]);
 
 		if (!$is_enabled) {
 			return;
@@ -228,11 +232,9 @@ class Faq_Ai_Generator_Public
 			);
 		}
 
-
-
-		// Print the JSON-LD schema directly
+		// Stampa lo schema JSON-LD con i tag script
 		echo "\n<!-- FAQ AI Generator Schema -->\n";
-		echo '<script type="application/ld+json" id="faq-ai-schema">' . wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+		echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
 	}
 
 }

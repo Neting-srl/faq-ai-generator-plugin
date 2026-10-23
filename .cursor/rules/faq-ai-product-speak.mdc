@@ -1,0 +1,37 @@
+---
+description: Linguaggio prodotto vs tooling — OpenAI OK nel plugin; zero leak Cursor/Claude/IDE in commit e file pubblici
+globs: "**/*"
+alwaysApply: true
+---
+
+# Prodotto AI vs leak tooling — FAQ AI Generator
+
+Questo plugin **è** un prodotto basato su modelli OpenAI. I riferimenti legittimi al servizio sono ammessi. I riferimenti a IDE/agenti AI usati in sviluppo **non** devono finire in Git pubblico, zip o wp.org.
+
+## Consentito (prodotto)
+
+Nei file del plugin, `readme.txt`, Settings, stringhe UI, commenti tecnici su integrazione API:
+
+- OpenAI, API key OpenAI, Chat Completions
+- Nomi modello (`gpt-6-luna`, ecc.)
+- “artificial intelligence” / “AI” nel senso di funzionalità del plugin
+- Schema.org, FAQ, ACF
+
+## Vietato (tooling / attribuzione)
+
+In codice shippato, `readme.txt`, changelog pubblico, messaggi di commit, PR body:
+
+- Cursor, cursor.com, Claude, Anthropic, Copilot, ChatGPT come *autore del codice*
+- `Co-Authored-By:` con Cursor/Claude/Copilot/GPT
+- `Generated with`, `AI-assisted`, `As an AI`, marker `@generated` da IDE
+- Emoji/robot o frasi da assistente (“Sure! Here's…”) in commit/changelog
+
+**Eccezione CSS:** la proprietà `cursor:` è ammessa.
+
+## Zona interna (OK parlare di tooling)
+
+- `.cursor/`, `AGENTS.md`, `scratchpad.md`, skill, docs interne non nello zip
+
+## Commit
+
+Messaggi professionali in **inglese**, senza attribuzioni AI. Prima di commit/push seguire skill `no-ai-leak-git`.

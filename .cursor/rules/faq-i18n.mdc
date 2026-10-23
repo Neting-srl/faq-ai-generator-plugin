@@ -1,0 +1,30 @@
+---
+description: i18n FAQ AI Generator — text domain faq-ai-generator, niente stringhe UI hardcoded, IT/EN
+globs: "**/*.php,**/*.js"
+alwaysApply: true
+---
+
+# Internazionalizzazione — FAQ AI Generator
+
+## Checklist UI
+
+1. Zero stringhe hardcoded visibili (label, button, notice, placeholder, errori AJAX).
+2. Text domain sempre **`faq-ai-generator`**.
+3. Escape corretto: `esc_html__()`, `esc_attr__()`, `esc_html_e()` dove serve.
+4. Variabili con `sprintf()` e placeholder posizionali (`%1$s`), mai concatenazione di pezzi tradotti.
+5. JS admin: stringhe via `wp_localize_script` (`faqAiGenerator.i18n` / `faqAiGeneratorSettings.i18n`), non letterali nella UI.
+6. Dopo nuove stringhe: aggiornare `languages/faq-ai-generator.pot` e i `.po` quando si fa release.
+
+## PHP
+
+| Contesto | Funzione |
+|----------|----------|
+| Ritorno stringa | `__( '…', 'faq-ai-generator' )` |
+| Echo | `_e( '…', 'faq-ai-generator' )` |
+| HTML escaped | `esc_html__( '…', 'faq-ai-generator' )` |
+| Attributo | `esc_attr__( '…', 'faq-ai-generator' )` |
+
+## Eccezioni
+
+- ID modello OpenAI tecnici (`gpt-6-luna`, ecc.) possono restare letterali.
+- Commenti codice in inglese (convenzione progetto).

@@ -1,0 +1,40 @@
+---
+description: WordPress Coding Standards per FAQ AI Generator (PHP, JS, CSS) — stile classico WP
+globs: "**/*.php,**/*.js,**/*.css"
+alwaysApply: false
+---
+
+# Coding Standards — FAQ AI Generator
+
+Riferimento: [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/).
+
+Plugin in stile **WordPress classico** (classi `Faq_Ai_Generator_*`, cartelle `includes`/`admin`/`public`). Non imporre PSR-4 o refactor massiccio senza richiesta esplicita.
+
+## PHP
+
+- Indentazione: **tab**.
+- Confronti strict `===` / `!==`.
+- Yoda conditions preferite sui literal: `'value' === $variable`.
+- `true` / `false` / `null` minuscoli.
+- Prefissi: funzioni/hook `faq_ai_`, meta `_faq_ai_*`, handle script `faq-ai-generator-*`.
+- Una responsabilità per metodo; riusa helper esistenti (DRY).
+- Niente short open tags.
+
+## JavaScript
+
+- Preferire IIFE/arrow jQuery già usate nei file admin/public.
+- Handle enqueue con dipendenze esplicite; versione = `FAQ_AI_GENERATOR_VERSION`.
+- Script in **footer** (`true` come `$in_footer`).
+- Enqueue **condizionale** (solo metabox/settings o frontend con FAQ).
+- Escape HTML quando si costruisce DOM da dati API (niente concatenazione grezza di question/answer).
+- Prima di commit JS: `biome check admin/js public/js` se Biome è disponibile.
+
+## CSS
+
+- Prefisso classi plugin: `faq-ai-` / `faq-ai-generator-`.
+- Stili metabox in `admin/css/`; niente grandi blocchi `<style>` inline nei partial.
+
+## Modifiche
+
+- Commit di solo stile separati da fix funzionali.
+- Non reintrodurre file JS duplicati o script inline nella metabox.

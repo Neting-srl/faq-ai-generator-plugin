@@ -1,0 +1,33 @@
+---
+description: Mantieni aggiornato scratchpad.md con attività aperte, rischi e follow-up
+alwaysApply: true
+---
+
+# Scratchpad di sessione — FAQ AI Generator
+
+Aggiorna **`scratchpad.md`** (root) quando emergono o si chiudono elementi rilevanti — non solo se l’utente scrive “plan”.
+
+## Quando aggiornare
+
+- task incompleti o rimandati
+- decisioni prese al volo
+- TODO / rischi / edge case da verificare
+- follow-up promessi
+- fine turno con lavoro sostanziale: allinea lo stato prima di concludere
+
+## Cosa non mettere
+
+- Segreti (API key, token)
+- Documentazione formale lunga (meglio `readme.txt` / commenti mirati)
+- Duplicare l’intero piano: solo ID, stato, prossima azione
+
+## Formato voce
+
+| Campo | Contenuto |
+|-------|-----------|
+| ID | `S-001`, `S-002`, … |
+| Stato | `aperto` · `in corso` · `bloccato` · `risolto` |
+| Priorità | `alta` · `media` · `bassa` |
+| Azione | prossimo passo concreto |
+
+Sposta in “Risolti” quando chiuso; aggiorna la data in testa al file.

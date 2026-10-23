@@ -15,6 +15,9 @@ if (!defined('FAQ_AI_DEBUG')) {
     define('FAQ_AI_DEBUG', isset($settings['debug_mode']) && $settings['debug_mode']);
 }
 
+require_once plugin_dir_path(__FILE__) . 'class-faq-ai-generator-models.php';
+
+
 class Faq_Ai_Generator_Api
 {
 
@@ -544,23 +547,30 @@ class Faq_Ai_Generator_Api
      * @param    array     $existing_faqs   FAQ esistenti
      * @return   string                     Il prompt completo
      */
-    private function build_prompt($content, $existing_faqs = array())
+    private function build_prompt($content, $existing_faqs = array(), $generation_hint = '')
     {
         $locale = get_locale();
+        $is_en = (strpos($locale, 'en_') === 0);
 
-        // 1. Inizia con il prompt base
+        // 1. Base prompt
         $prompt = $this->get_base_prompt();
 
-        // 2. Aggiungi eventuali istruzioni extra dalle impostazioni
-        $settings = get_option('faq_ai_generator_settings');
+        // 2. Global extra instructions from settings
+        $settings = get_option('faq_ai_generator_settings', array());
         if (!empty($settings['extra_prompt'])) {
-            $prompt .= ($locale === 'en_US' ? "EXTRA INSTRUCTIONS:\n" : "ISTRUZIONI EXTRA:\n") .
+            $prompt .= ($is_en ? "EXTRA INSTRUCTIONS:\n" : "ISTRUZIONI EXTRA:\n") .
                 trim($settings['extra_prompt']) . "\n\n";
         }
 
-        // 3. Aggiungi le FAQ esistenti se presenti
+        // 3. Per-generation hint from metabox
+        if (!empty($generation_hint)) {
+            $prompt .= ($is_en ? "GENERATION HINT (follow closely):\n" : "HINT DI GENERAZIONE (segui attentamente):\n") .
+                trim($generation_hint) . "\n\n";
+        }
+
+        // 4. Existing FAQs
         if (!empty($existing_faqs)) {
-            $prompt .= ($locale === 'en_US' ? "EXISTING FAQS (generate different FAQs from these):\n" : "FAQ GIÀ ESISTENTI (genera FAQ diverse da queste):\n");
+            $prompt .= ($is_en ? "EXISTING FAQS (generate different FAQs from these):\n" : "FAQ GIÀ ESISTENTI (genera FAQ diverse da queste):\n");
             foreach ($existing_faqs as $index => $faq) {
                 $prompt .= sprintf(
                     "%d. Q: %s\nA: %s\n\n",
@@ -571,25 +581,66 @@ class Faq_Ai_Generator_Api
             }
         }
 
-        // 4. Aggiungi il contenuto dell'articolo
-        $prompt .= ($locale === 'en_US' ? "CONTENT TO ANALYZE:\n\n" : "CONTENUTO DA ANALIZZARE:\n\n") .
+        // 5. Post content
+        $prompt .= ($is_en ? "CONTENT TO ANALYZE:\n\n" : "CONTENUTO DA ANALIZZARE:\n\n") .
             html_entity_decode(wp_strip_all_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        // 5. Assicurati che il prompt sia in UTF-8 pulito
         $prompt = mb_convert_encoding($prompt, 'UTF-8', 'UTF-8');
 
         return $prompt;
     }
 
     /**
+     * List chat-capable models available to the configured API key.
+     *
+     * @since    1.1.5
+     * @return   array|WP_Error
+     */
+    public function list_models()
+    {
+        if (empty($this->api_key)) {
+            return new WP_Error('no_api_key', __('API key not configured', 'faq-ai-generator'));
+        }
+
+        $response = wp_remote_get('https://api.openai.com/v1/models', array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $this->api_key,
+            ),
+            'timeout' => 60,
+        ));
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $code = wp_remote_retrieve_response_code($response);
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        if ($code < 200 || $code >= 300 || empty($body['data']) || !is_array($body['data'])) {
+            $message = isset($body['error']['message']) ? $body['error']['message'] : __('Unable to sync models from OpenAI.', 'faq-ai-generator');
+            return new WP_Error('sync_failed', $message);
+        }
+
+        $ids = array();
+        foreach ($body['data'] as $model) {
+            if (!empty($model['id']) && Faq_Ai_Generator_Models::is_chat_model_id($model['id'])) {
+                $ids[] = $model['id'];
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
      * Generate FAQs from post content
      *
      * @since    1.0.0
-     * @param    string    $content        The post content
-     * @param    array     $existing_faqs  Existing FAQs to consider
-     * @return   array|WP_Error           Generated FAQs or error
+     * @param    string    $content           The post content
+     * @param    array     $existing_faqs     Existing FAQs to consider
+     * @param    string    $generation_hint   Optional per-generation hint
+     * @return   array|WP_Error               Generated FAQs or error
      */
-    public function generate_faqs($content, $existing_faqs = array())
+    public function generate_faqs($content, $existing_faqs = array(), $generation_hint = '')
     {
         if (empty($this->api_key)) {
             return new WP_Error('no_api_key', __('API key not configured', 'faq-ai-generator'));
@@ -694,8 +745,11 @@ class Faq_Ai_Generator_Api
             }
         }
 
+        $settings = get_option('faq_ai_generator_settings', array());
+        $this->model_id = Faq_Ai_Generator_Models::resolve_model_id($settings);
+
         // Genera il prompt completo
-        $prompt = $this->build_prompt($content, $existing_faqs);
+        $prompt = $this->build_prompt($content, $existing_faqs, $generation_hint);
         if (FAQ_AI_DEBUG) {
             Faq_Ai_Generator_Logger::debug('Built prompt, length: ' . strlen($prompt));
             Faq_Ai_Generator_Logger::debug('Prompt content: ' . substr($prompt, 0, 500) . '...');

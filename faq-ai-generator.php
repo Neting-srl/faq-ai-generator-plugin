@@ -11,9 +11,9 @@
  * Plugin Name:       FAQ AI Generator
  * Plugin URI:        https://github.com/netingweb/faq-ai-generator-plugin
  * Description:       Automatically generate FAQs for your WordPress content using artificial intelligence.
- * Version:           1.1.4
+ * Version:           1.1.5
  * Requires at least: 5.0
- * Tested up to:      6.4
+ * Tested up to:      6.8
  * Requires PHP:      7.4
  * Author:            netingweb
  * Author URI:        https://profiles.wordpress.org/netingweb/
@@ -53,7 +53,7 @@ if (version_compare(PHP_VERSION, '7.4', '<')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('FAQ_AI_GENERATOR_VERSION', '1.1.4');
+define('FAQ_AI_GENERATOR_VERSION', '1.1.5');
 
 /**
  * The code that runs during plugin activation.
