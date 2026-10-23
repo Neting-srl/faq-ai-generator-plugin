@@ -9,33 +9,33 @@
  * @subpackage Faq_Ai_Generator/admin/partials
  */
 
-if (!defined('WPINC')) {
-	die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 require_once plugin_dir_path(dirname(__FILE__)) . '../includes/class-faq-ai-generator-models.php';
 
-$default_model = Faq_Ai_Generator_Models::get_default_model();
-$settings = get_option('faq_ai_generator_settings', array(
+$faq_ai_default_model = Faq_Ai_Generator_Models::get_default_model();
+$faq_ai_settings = get_option('faq_ai_generator_settings', array(
 	'api_key' => '',
 	'ai_provider' => 'openai',
-	'model' => $default_model,
+	'model' => $faq_ai_default_model,
 	'custom_model_id' => '',
 	'extra_prompt' => '',
 	'enabled_post_types' => array(),
 ));
 
-$api_status = get_transient('faq_ai_api_status');
-$api_error = get_transient('faq_ai_api_error');
+$faq_ai_api_status = get_transient('faq_ai_api_status');
+$faq_ai_api_error = get_transient('faq_ai_api_error');
 
-$available_models = Faq_Ai_Generator_Models::get_all_models();
-$model_options = Faq_Ai_Generator_Models::get_model_options();
-$selected_model = isset($settings['model']) ? $settings['model'] : $default_model;
-$custom_model_id = isset($settings['custom_model_id']) ? $settings['custom_model_id'] : '';
-$model_obsolete = empty($custom_model_id) && Faq_Ai_Generator_Models::is_model_obsolete($selected_model);
+$faq_ai_available_models = Faq_Ai_Generator_Models::get_all_models();
+$faq_ai_model_options = Faq_Ai_Generator_Models::get_model_options();
+$faq_ai_selected_model = isset($faq_ai_settings['model']) ? $faq_ai_settings['model'] : $faq_ai_default_model;
+$faq_ai_custom_model_id = isset($faq_ai_settings['custom_model_id']) ? $faq_ai_settings['custom_model_id'] : '';
+$faq_ai_model_obsolete = empty($faq_ai_custom_model_id) && Faq_Ai_Generator_Models::is_model_obsolete($faq_ai_selected_model);
 
-if ($model_obsolete) {
-	$selected_model = $default_model;
+if ($faq_ai_model_obsolete) {
+	$faq_ai_selected_model = $faq_ai_default_model;
 }
 
 settings_errors('faq_ai_generator_settings');
@@ -44,13 +44,13 @@ settings_errors('faq_ai_generator_settings');
 <div class="wrap">
 	<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-	<?php if ($api_error) : ?>
+	<?php if ($faq_ai_api_error) : ?>
 		<div class="notice notice-error">
-			<p><?php echo esc_html($api_error); ?></p>
+			<p><?php echo esc_html($faq_ai_api_error); ?></p>
 		</div>
 	<?php endif; ?>
 
-	<?php if ($model_obsolete) : ?>
+	<?php if ($faq_ai_model_obsolete) : ?>
 		<div class="notice notice-warning">
 			<p>
 				<?php
@@ -78,11 +78,11 @@ settings_errors('faq_ai_generator_settings');
 					<input type="password"
 						   id="api_key"
 						   name="faq_ai_generator_settings[api_key]"
-						   value="<?php echo esc_attr(isset($settings['api_key']) ? $settings['api_key'] : ''); ?>"
+						   value="<?php echo esc_attr(isset($faq_ai_settings['api_key']) ? $faq_ai_settings['api_key'] : ''); ?>"
 						   class="regular-text" />
-					<?php if (!empty($settings['api_key'])) : ?>
-						<span class="api-status <?php echo esc_attr($api_status ? $api_status : ''); ?>">
-							<?php echo $api_status === 'valid' ? '✓' : '✗'; ?>
+					<?php if (!empty($faq_ai_settings['api_key'])) : ?>
+						<span class="api-status <?php echo esc_attr($faq_ai_api_status ? $faq_ai_api_status : ''); ?>">
+							<?php echo $faq_ai_api_status === 'valid' ? '✓' : '✗'; ?>
 						</span>
 					<?php endif; ?>
 					<p class="description">
@@ -98,7 +98,7 @@ settings_errors('faq_ai_generator_settings');
 				</th>
 				<td>
 					<select id="ai_provider" name="faq_ai_generator_settings[ai_provider]">
-						<option value="openai" <?php selected(isset($settings['ai_provider']) ? $settings['ai_provider'] : 'openai', 'openai'); ?>>
+						<option value="openai" <?php selected(isset($faq_ai_settings['ai_provider']) ? $faq_ai_settings['ai_provider'] : 'openai', 'openai'); ?>>
 							<?php esc_html_e('OpenAI', 'faq-ai-generator'); ?>
 						</option>
 					</select>
@@ -111,15 +111,15 @@ settings_errors('faq_ai_generator_settings');
 				</th>
 				<td>
 					<select id="model" name="faq_ai_generator_settings[model]">
-						<?php foreach ($model_options as $id => $name) : ?>
-							<option value="<?php echo esc_attr($id); ?>" <?php selected($selected_model, $id); ?>>
-								<?php echo esc_html($name); ?>
+						<?php foreach ($faq_ai_model_options as $faq_ai_model_id => $faq_ai_model_name) : ?>
+							<option value="<?php echo esc_attr($faq_ai_model_id); ?>" <?php selected($faq_ai_selected_model, $faq_ai_model_id); ?>>
+								<?php echo esc_html($faq_ai_model_name); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>
-					<?php if (isset($available_models[ $selected_model ]['description'])) : ?>
+					<?php if (isset($faq_ai_available_models[ $faq_ai_selected_model ]['description'])) : ?>
 						<p class="description">
-							<?php echo esc_html($available_models[ $selected_model ]['description']); ?>
+							<?php echo esc_html($faq_ai_available_models[ $faq_ai_selected_model ]['description']); ?>
 						</p>
 					<?php endif; ?>
 					<p>
@@ -139,7 +139,7 @@ settings_errors('faq_ai_generator_settings');
 					<input type="text"
 						   id="custom_model_id"
 						   name="faq_ai_generator_settings[custom_model_id]"
-						   value="<?php echo esc_attr($custom_model_id); ?>"
+						   value="<?php echo esc_attr($faq_ai_custom_model_id); ?>"
 						   class="regular-text"
 						   placeholder="gpt-6-luna" />
 					<p class="description">
@@ -158,7 +158,7 @@ settings_errors('faq_ai_generator_settings');
 						name="faq_ai_generator_settings[extra_prompt]"
 						class="large-text code"
 						rows="3"
-					><?php echo esc_textarea(isset($settings['extra_prompt']) ? $settings['extra_prompt'] : ''); ?></textarea>
+					><?php echo esc_textarea(isset($faq_ai_settings['extra_prompt']) ? $faq_ai_settings['extra_prompt'] : ''); ?></textarea>
 					<p class="description">
 						<?php esc_html_e('Global instructions always added to the AI prompt. For per-post topics use the Generation hint in the metabox.', 'faq-ai-generator'); ?>
 					</p>
@@ -171,17 +171,17 @@ settings_errors('faq_ai_generator_settings');
 				</th>
 				<td>
 					<?php
-					$custom_post_types = get_post_types(array('_builtin' => false), 'objects');
-					if (!empty($custom_post_types)) {
-						foreach ($custom_post_types as $post_type) {
-							$enabled = isset($settings['enabled_post_types'][ $post_type->name ]) ? $settings['enabled_post_types'][ $post_type->name ] : false;
+					$faq_ai_custom_post_types = get_post_types(array('_builtin' => false), 'objects');
+					if (!empty($faq_ai_custom_post_types)) {
+						foreach ($faq_ai_custom_post_types as $faq_ai_post_type) {
+							$faq_ai_enabled = isset($faq_ai_settings['enabled_post_types'][ $faq_ai_post_type->name ]) ? $faq_ai_settings['enabled_post_types'][ $faq_ai_post_type->name ] : false;
 							?>
 							<label>
 								<input type="checkbox"
-									   name="faq_ai_generator_settings[enabled_post_types][<?php echo esc_attr($post_type->name); ?>]"
+									   name="faq_ai_generator_settings[enabled_post_types][<?php echo esc_attr($faq_ai_post_type->name); ?>]"
 									   value="1"
-									   <?php checked($enabled, true); ?>>
-								<?php echo esc_html($post_type->label); ?>
+									   <?php checked($faq_ai_enabled, true); ?>>
+								<?php echo esc_html($faq_ai_post_type->label); ?>
 							</label><br>
 							<?php
 						}
@@ -198,12 +198,12 @@ settings_errors('faq_ai_generator_settings');
 				</th>
 				<td>
 					<?php
-					$default_post_types = array(
+					$faq_ai_default_post_types = array(
 						'post' => true,
 						'page' => false,
 					);
-					$enabled_post_types = isset($settings['enabled_post_types']) ? $settings['enabled_post_types'] : array();
-					$enabled_post_types = array_merge($default_post_types, $enabled_post_types);
+					$faq_ai_enabled_post_types = isset($faq_ai_settings['enabled_post_types']) ? $faq_ai_settings['enabled_post_types'] : array();
+					$faq_ai_enabled_post_types = array_merge($faq_ai_default_post_types, $faq_ai_enabled_post_types);
 					?>
 					<label>
 						<input type="checkbox"
@@ -211,7 +211,7 @@ settings_errors('faq_ai_generator_settings');
 							   value="1"
 							   readonly="readonly"
 							   class="readonly-checkbox"
-							   <?php checked($enabled_post_types['post'], true); ?>>
+							   <?php checked($faq_ai_enabled_post_types['post'], true); ?>>
 						<?php esc_html_e('Posts', 'faq-ai-generator'); ?>
 						<span class="description"><?php esc_html_e('(Always enabled)', 'faq-ai-generator'); ?></span>
 					</label><br>
@@ -219,7 +219,7 @@ settings_errors('faq_ai_generator_settings');
 						<input type="checkbox"
 							   name="faq_ai_generator_settings[enabled_post_types][page]"
 							   value="1"
-							   <?php checked($enabled_post_types['page'], true); ?>>
+							   <?php checked($faq_ai_enabled_post_types['page'], true); ?>>
 						<?php esc_html_e('Pages', 'faq-ai-generator'); ?>
 					</label>
 				</td>
@@ -235,7 +235,7 @@ settings_errors('faq_ai_generator_settings');
 							   id="debug_mode"
 							   name="faq_ai_generator_settings[debug_mode]"
 							   value="1"
-							   <?php checked(isset($settings['debug_mode']) ? $settings['debug_mode'] : false, true); ?>>
+							   <?php checked(isset($faq_ai_settings['debug_mode']) ? $faq_ai_settings['debug_mode'] : false, true); ?>>
 						<?php esc_html_e('Enable debug mode', 'faq-ai-generator'); ?>
 					</label>
 					<p class="description">

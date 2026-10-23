@@ -5,6 +5,30 @@ Tutte le modifiche notevoli a questo progetto saranno documentate in questo file
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e questo progetto aderisce a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.9] - 2026-10-23
+
+### Fixed
+
+- Restored original front-end FAQ markup, CSS, and accordion JavaScript
+
+## [1.1.8] - 2026-10-23
+
+### Fixed
+
+- OpenAI API: omit custom `temperature` for GPT-5/GPT-6 (default only)
+
+## [1.1.7] - 2026-10-23
+
+### Fixed
+
+- OpenAI API: use `max_completion_tokens` instead of `max_tokens` for newer models
+
+## [1.1.6] - 2026-10-23
+
+### Fixed
+
+- Plugin Check errors: `Tested up to` 7.1, ABSPATH guards, prefixed bootstrap functions and template variables
+
 ## [1.1.5] - 2026-10-23
 
 ### Added

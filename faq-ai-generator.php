@@ -11,9 +11,9 @@
  * Plugin Name:       FAQ AI Generator
  * Plugin URI:        https://github.com/netingweb/faq-ai-generator-plugin
  * Description:       Automatically generate FAQs for your WordPress content using artificial intelligence.
- * Version:           1.1.5
+ * Version:           1.1.9
  * Requires at least: 5.0
- * Tested up to:      6.8
+ * Tested up to:      7.1
  * Requires PHP:      7.4
  * Author:            netingweb
  * Author URI:        https://profiles.wordpress.org/netingweb/
@@ -53,13 +53,13 @@ if (version_compare(PHP_VERSION, '7.4', '<')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('FAQ_AI_GENERATOR_VERSION', '1.1.5');
+define('FAQ_AI_GENERATOR_VERSION', '1.1.9');
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-faq-ai-generator-activator.php
  */
-function activate_faq_ai_generator()
+function faq_ai_generator_activate()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator-activator.php';
 	Faq_Ai_Generator_Activator::activate();
@@ -69,14 +69,14 @@ function activate_faq_ai_generator()
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-faq-ai-generator-deactivator.php
  */
-function deactivate_faq_ai_generator()
+function faq_ai_generator_deactivate()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator-deactivator.php';
 	Faq_Ai_Generator_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_faq_ai_generator');
-register_deactivation_hook(__FILE__, 'deactivate_faq_ai_generator');
+register_activation_hook(__FILE__, 'faq_ai_generator_activate');
+register_deactivation_hook(__FILE__, 'faq_ai_generator_deactivate');
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -93,11 +93,11 @@ require plugin_dir_path(__FILE__) . 'includes/class-faq-ai-generator.php';
  *
  * @since    1.0.0
  */
-function run_faq_ai_generator()
+function faq_ai_generator_run()
 {
 
 	$plugin = new Faq_Ai_Generator();
 	$plugin->run();
 
 }
-run_faq_ai_generator();
+faq_ai_generator_run();

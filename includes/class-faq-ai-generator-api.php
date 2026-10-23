@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 /**
  * The API integration class
  *
@@ -11,8 +13,8 @@
 
 // Definizione della costante di debug
 if (!defined('FAQ_AI_DEBUG')) {
-    $settings = get_option('faq_ai_generator_settings', array());
-    define('FAQ_AI_DEBUG', isset($settings['debug_mode']) && $settings['debug_mode']);
+    $faq_ai_generator_debug_settings = get_option('faq_ai_generator_settings', array());
+    define('FAQ_AI_DEBUG', !empty($faq_ai_generator_debug_settings['debug_mode']));
 }
 
 require_once plugin_dir_path(__FILE__) . 'class-faq-ai-generator-models.php';
@@ -768,8 +770,9 @@ class Faq_Ai_Generator_Api
                     'content' => $prompt
                 )
             ),
-            'temperature' => 0.7,
-            'max_tokens' => 4000
+            // GPT-5/GPT-6 models often only allow the default temperature (1); omit the param.
+            // GPT-5/GPT-6 reject max_tokens; use max_completion_tokens.
+            'max_completion_tokens' => 4000
         );
 
         // Modifica dei log per usare la costante di debug

@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 /**
  * Logger utility for the plugin.
  *
@@ -93,14 +95,14 @@ class Faq_Ai_Generator_Logger
 
 		// Format the message
 		if (is_array($message) || is_object($message)) {
-			$log_entry .= print_r($message, true);
+			$log_entry .= print_r($message, true); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		} else {
 			$log_entry .= $message;
 		}
 
 		// Add the context if present
 		if (!empty($context)) {
-			$log_entry .= ' - Context: ' . print_r($context, true);
+			$log_entry .= ' - Context: ' . print_r($context, true); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 
 		// Add the plugin prefix
@@ -108,7 +110,7 @@ class Faq_Ai_Generator_Logger
 
 		// Write in the WordPress log
 		if (defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-			error_log($log_entry);
+			error_log($log_entry); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		}
 	}
 

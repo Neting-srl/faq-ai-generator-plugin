@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 /**
  * The public-facing functionality of the plugin.
  *
@@ -161,16 +163,16 @@ class Faq_Ai_Generator_Public {
 			return $content;
 		}
 
-		// Genera l'HTML delle FAQ
-		$faq_html = '<div class="faq-ai-container">';
-		$faq_html .= '<h2>' . __('Frequently Asked Questions', 'faq-ai-generator') . '</h2>';
-		$faq_html .= '<div class="faq-ai-list">';
+		// Genera l'HTML delle FAQ (markup allineato al CSS pubblico originale).
+		$faq_html = '<div class="faq-ai-generator-container">';
+		$faq_html .= '<h2>' . esc_html__('Frequently Asked Questions', 'faq-ai-generator') . '</h2>';
+		$faq_html .= '<div class="faq-ai-generator-list">';
 
 		foreach ($faq_data['faqs'] as $faq) {
 			$faq_html .= sprintf(
-				'<div class="faq-ai-item">
-					<div class="faq-ai-question">%s</div>
-					<div class="faq-ai-answer">%s</div>
+				'<div class="faq-item">
+					<div class="faq-question">%s</div>
+					<div class="faq-answer">%s</div>
 				</div>',
 				esc_html($faq['question']),
 				wpautop(wp_kses_post($faq['answer']))

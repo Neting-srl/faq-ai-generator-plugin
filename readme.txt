@@ -2,8 +2,8 @@
 Contributors: netingweb
 Tags: faq, ai, openai, schema.org, acf
 Requires at least: 5.0
-Tested up to: 6.8
-Stable tag: 1.1.5
+Tested up to: 7.1
+Stable tag: 1.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,18 @@ The data is processed by OpenAI's models to generate relevant questions and answ
 * OpenAI Privacy Policy: https://openai.com/policies/privacy-policy
 
 == Changelog ==
+
+= 1.1.9 =
+* Restored original front-end FAQ markup, CSS and accordion JS
+
+= 1.1.8 =
+* Fixed OpenAI API request for GPT-5/GPT-6: omit custom temperature (only default supported)
+
+= 1.1.7 =
+* Fixed OpenAI API request for GPT-5/GPT-6: use max_completion_tokens instead of max_tokens
+
+= 1.1.6 =
+* Plugin Check compliance: Tested up to 7.1, ABSPATH guards, prefixed bootstrap functions
 
 = 1.1.5 =
 * Fixed FAQ generation AJAX and unified metabox JavaScript
